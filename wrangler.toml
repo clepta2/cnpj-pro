@@ -1,0 +1,14 @@
+name = "cnpj-pro-api"
+main = "worker.js"
+compatibility_date = "2026-10-01"
+account_id = "10db5eac4dab12f6842b855a953d3018"
+workers_dev = true
+
+[observability]
+enabled = true
+
+[vars]
+ENVIRONMENT = "production"
+API_VERSION = "1.0.0"
+MARKETPLACE_URL = "https://ponte.ozpro.com.br"
+DEFAULT_CACHE_TTL = "604800"

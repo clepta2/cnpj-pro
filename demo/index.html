@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CNPJ Pro — Playground & Demonstração Interativa</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #090d16;
+      --card-bg: #111827;
+      --card-border: rgba(255, 255, 255, 0.08);
+      --primary: #3b82f6;
+      --primary-hover: #2563eb;
+      --accent: #10b981;
+      --text: #f3f4f6;
+      --text-muted: #9ca3af;
+      --code-bg: #030712;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding: 24px 16px;
+    }
+    .container { max-width: 1100px; margin: 0 auto; }
+    header { text-align: center; margin-bottom: 32px; }
+    .badge-top {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+    h1 {
+      font-size: 2.25rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+      background: linear-gradient(135deg, #fff 40%, #6ee7b7 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .subtitle { color: var(--text-muted); font-size: 1.05rem; max-width: 650px; margin: 0 auto 20px; }
+    .market-banner {
+      background: linear-gradient(90deg, rgba(16, 185, 129, 0.1) 0%, rgba(59, 130, 246, 0.1) 100%);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      border-radius: 12px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+    .market-banner p { font-size: 14px; color: #cbd5e1; }
+    .market-banner strong { color: #fff; }
+    .btn-buy {
+      background: var(--accent);
+      color: #064e3b;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 13px;
+      padding: 8px 18px;
+      border-radius: 8px;
+      white-space: nowrap;
+      transition: background 0.2s;
+    }
+    .btn-buy:hover { background: #34d399; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    @media (max-width: 800px) { .grid { grid-template-columns: 1fr; } }
+    .card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 24px; }
+    .card h2 { font-size: 1.2rem; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+    .search-box { display: flex; gap: 8px; margin-bottom: 16px; }
+    input[type="text"] {
+      flex: 1;
+      background: #1f2937;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: #fff;
+      font-size: 14px;
+      outline: none;
+    }
+    input[type="text"]:focus { border-color: var(--accent); }
+    button.btn-search {
+      background: var(--accent);
+      color: #064e3b;
+      border: none;
+      padding: 0 16px;
+      border-radius: 8px;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .company-preview {
+      background: #0f172a;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 16px;
+    }
+    .preview-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+    .preview-header h3 { font-size: 1.1rem; color: #fff; }
+    .preview-header span { font-size: 12px; color: var(--accent); font-weight: 700; }
+    .specs-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 14px; }
+    .spec-item { background: rgba(255, 255, 255, 0.03); padding: 8px 12px; border-radius: 8px; }
+    .spec-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; }
+    .spec-val { font-size: 13px; font-weight: 600; color: #e2e8f0; margin-top: 2px; }
+    .code-box {
+      background: var(--code-bg);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      padding: 16px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: #6ee7b7;
+      overflow-x: auto;
+      max-height: 380px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <div class="badge-top">🏢 Base de 20 Milhões de Empresas</div>
+    <h1>CNPJ Pro — SDK & API</h1>
+    <p class="subtitle">Consulta cadastral ultra-rápida de empresas brasileiras, situação na Receita Federal, quadro societário (QSA) e localização em Cloudflare Edge.</p>
+  </header>
+
+  <div class="market-banner">
+    <div>
+      <strong>🔑 Obtenha sua Chave de API de Produção</strong>
+      <p>Consultas em tempo real com respostas em sub-30ms e dados atualizados bimestralmente.</p>
+    </div>
+    <a href="https://ponte.ozpro.com.br" class="btn-buy" target="_blank">Acessar Ponte API Marketplace →</a>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <h2>🔍 Consulta em Tempo Real</h2>
+      <div class="search-box">
+        <input type="text" id="input-cnpj" placeholder="Digite um CNPJ (ex: 48.916.772/0001-00)" value="48.916.772/0001-00">
+        <button class="btn-search" id="btn-run">Consultar</button>
+      </div>
+
+      <div class="company-preview" id="company-view">
+        <div class="preview-header">
+          <div>
+            <h3 id="comp-razao">OZPRO ENTERPRISE TECNOLOGIA LTDA</h3>
+            <span id="comp-fantasia" style="color: #94a3b8; font-size: 12px;">OZPRO CLOUD</span>
+          </div>
+          <span style="background: rgba(16, 185, 129, 0.15); color: #34d399; padding: 2px 8px; border-radius: 4px;" id="comp-status">ATIVA</span>
+        </div>
+        <div class="specs-grid">
+          <div class="spec-item"><div class="spec-label">CNPJ</div><div class="spec-val" id="comp-cnpj">48.916.772/0001-00</div></div>
+          <div class="spec-item"><div class="spec-label">Abertura</div><div class="spec-val" id="comp-abertura">15/09/2022</div></div>
+          <div class="spec-item"><div class="spec-label">CNAE Principal</div><div class="spec-val" id="comp-cnae">6201-5/01 (Software)</div></div>
+          <div class="spec-item"><div class="spec-label">Localização</div><div class="spec-val" id="comp-loc">São Paulo - SP</div></div>
+          <div class="spec-item"><div class="spec-label">Quadro Societário</div><div class="spec-val" id="comp-socios">1 Administrador</div></div>
+          <div class="spec-item"><div class="spec-label">Porte / Simples</div><div class="spec-val" id="comp-porte">ME (Simples Nacional)</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>⚡ Snippet de Integração</h2>
+      <pre class="code-box" id="code-snippet">// Instale ou importe o SDK CNPJ Pro
+import CnpjPro from 'cnpj-pro';
+
+const cnpj = new CnpjPro({
+  apiKey: 'cnpj_live_SEU_TOKEN' // Adquira no Ponte API
+});
+
+// Consulta com validação automática de dígito verificador
+const empresa = await cnpj.consultar('48916772000100');
+console.log(empresa.razaoSocial, empresa.situacaoCadastral);</pre>
+
+      <h2 style="margin-top: 20px;">📄 Resposta JSON da API</h2>
+      <pre class="code-box" id="json-viewer">{
+  "ok": true,
+  "data": {
+    "cnpj": "48916772000100",
+    "razaoSocial": "OZPRO ENTERPRISE TECNOLOGIA LTDA",
+    "situacaoCadastral": "ATIVA"
+  }
+}</pre>
+    </div>
+  </div>
+</div>
+
+<script src="../cnpj-pro.js"></script>
+<script>
+  const api = new CnpjPro();
+  const input = document.getElementById('input-cnpj');
+  const btn = document.getElementById('btn-run');
+  const jsonViewer = document.getElementById('json-viewer');
+
+  async function consultarCnpj(val) {
+    try {
+      const res = await api.consultar(val);
+      const data = res.data || res;
+      jsonViewer.textContent = JSON.stringify(data, null, 2);
+
+      document.getElementById('comp-razao').textContent = data.razaoSocial;
+      document.getElementById('comp-fantasia').textContent = data.nomeFantasia || 'Sem nome fantasia';
+      document.getElementById('comp-status').textContent = data.situacaoCadastral;
+      document.getElementById('comp-cnpj').textContent = api.formatar(data.cnpj);
+      document.getElementById('comp-cnae').textContent = data.cnaePrincipal;
+      document.getElementById('comp-loc').textContent = (data.endereco.municipio || '') + ' - ' + (data.endereco.uf || '');
+      document.getElementById('comp-socios').textContent = (data.socios?.length || 0) + ' Sócio(s)';
+      document.getElementById('comp-porte').textContent = (data.porte || 'ME') + (data.opcaoSimples ? ' · Simples Nacional' : '');
+    } catch (e) {
+      alert(e.message);
+    }
+  }
+
+  btn.addEventListener('click', () => consultarCnpj(input.value));
+  consultarCnpj('48916772000100');
+</script>
+
+</body>
+</html>
