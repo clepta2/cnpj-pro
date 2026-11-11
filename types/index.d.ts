@@ -31,6 +31,15 @@ export interface ContatoEmpresa {
   email?: string;
 }
 
+export interface ValidacaoEmpresaReal {
+  scoreLegitimidade: number;
+  empresaAtiva: boolean;
+  tempoAtividadeAnos: number;
+  statusLegitimidade: 'ALTA_LEGITIMIDADE' | 'REGULAR' | 'INCOMPLETA_OU_BAIXADA';
+  contatoVerificado: boolean;
+  enderecoCompleto: boolean;
+}
+
 export interface DadosCadastraisEmpresa {
   cnpj: string;
   razaoSocial: string;
@@ -39,6 +48,7 @@ export interface DadosCadastraisEmpresa {
   dataSituacaoCadastral?: string;
   motivoSituacaoCadastral?: string;
   dataInicioAtividade?: string;
+  validacaoEmpresaReal?: ValidacaoEmpresaReal;
   cnaePrincipal: string;
   cnaePrincipalDescricao: string;
   cnaesSecundarios?: string[];

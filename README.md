@@ -98,7 +98,20 @@ Base URL Oficial de Borda (Cloudflare Anycast):
 `https://cnpj-pro-api.fichatecnica-api.workers.dev`
 
 ### 1. `GET /api/cnpj/:cnpj` (Cadastro Completo Enriquecido)
-Retorna todos os dados cadastrais detalhados, porte, regime tributário, CNAE decodificado, endereço e sócios.
+Retorna todos os dados cadastrais detalhados, porte, regime tributário, CNAE decodificado, endereço, sócios e o bloco de **Validação de Empresa Real (Score de Legitimidade)**:
+
+> ℹ️ **Nota de Transparência:** Este índice **NÃO é um score de crédito financeiro/bancário**. Trata-se de uma métrica algorítmica proprietária que verifica a **autenticidade e consistência cadastral** (se a empresa é real, se está ATIVA na Receita Federal, seu tempo de mercado e se possui canais de contato e endereço completos para prevenção a empresas fantasmas/fraudes).
+
+```json
+"validacaoEmpresaReal": {
+  "scoreLegitimidade": 890,
+  "empresaAtiva": true,
+  "tempoAtividadeAnos": 4,
+  "statusLegitimidade": "ALTA_LEGITIMIDADE",
+  "contatoVerificado": true,
+  "enderecoCompleto": true
+}
+```
 
 ---
 

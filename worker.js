@@ -181,7 +181,7 @@ function enrichCompany(c) {
   const anoAtual = new Date().getFullYear();
   const tempoAtividadeAnos = Math.max(0, anoAtual - anoEstimado);
 
-  // Score Cadastral e de Risco (0 a 1000)
+  // Score de Legitimidade e Completude Cadastral (0 a 1000 - Mede se a empresa é real, ativa e com dados verificados)
   let score = 150;
   if (c.situacaoCadastral === 'ATIVA') score += 400;
   else if (c.situacaoCadastral === 'BAIXADA') score = 40;
@@ -197,20 +197,28 @@ function enrichCompany(c) {
   if (c.endereco?.logradouro && c.endereco?.cep) score += 90;
 
   score = Math.min(1000, score);
-  const nivelRisco = score >= 750 ? 'BAIXO' : (score >= 450 ? 'MEDIO' : 'ALTO');
+  const legitimidade = score >= 750 ? 'ALTA_LEGITIMIDADE' : (score >= 450 ? 'REGULAR' : 'INCOMPLETA_OU_BAIXADA');
 
   return {
     cnpj: cnpjClean,
     cnpjFormatado: formatarCnpj(cnpjClean),
-    razaoSocial: c.razaoSocial || 'NOME N?O INFORMADO',
+    razaoSocial: c.razaoSocial || 'NOME NÃO INFORMADO',
     nomeFantasia: c.nomeFantasia || null,
     tipo,
     situacaoCadastral: c.situacaoCadastral || 'ATIVA',
     anoFundacao: anoEstimado,
     dataInicioAtividade: c.dataInicioAtividade || `${anoEstimado}-01-01`,
+    validacaoEmpresaReal: {
+      scoreLegitimidade: score,
+      empresaAtiva: c.situacaoCadastral === 'ATIVA',
+      tempoAtividadeAnos,
+      statusLegitimidade: legitimidade,
+      contatoVerificado: Boolean(tel && c.contato?.email),
+      enderecoCompleto: Boolean(c.endereco?.logradouro && c.endereco?.cep)
+    },
     analiseCadastral: {
       score,
-      nivelRisco,
+      nivelRisco: score >= 750 ? 'BAIXO' : (score >= 450 ? 'MEDIO' : 'ALTO'),
       tempoAtividadeAnos,
       confiabilidade: score >= 750 ? 'ALTA' : (score >= 450 ? 'REGULAR' : 'CRITICA')
     },
