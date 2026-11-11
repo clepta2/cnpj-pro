@@ -183,6 +183,43 @@ Busca prospectiva por Razão Social, CNAE, UF, Ano e Tipo Societário.
 
 ---
 
+### 7. `POST /api/cnpj/lote` (Consulta em Lote - Batch)
+Envia até 100 CNPJs em uma única requisição HTTP para enriquecimento massivo de cadastros:
+```json
+// POST /api/cnpj/lote
+{
+  "cnpjs": ["48916772000100", "33000167000101", "00000000000191"],
+  "puxada": "resumo"
+}
+```
+* **Resposta (200 OK):**
+```json
+{
+  "ok": true,
+  "totalConsultados": 3,
+  "totalEncontrados": 3,
+  "puxada": "resumo",
+  "data": [
+    {
+      "cnpj": "48916772000100",
+      "razaoSocial": "OZPRO ENTERPRISE TECNOLOGIA LTDA",
+      "tipo": "LTDA",
+      "situacaoCadastral": "ATIVA",
+      "anoFundacao": 2022,
+      "score": 890,
+      "uf": "SP"
+    }
+  ]
+}
+```
+
+---
+
+### 8. `GET /api/cnpj/:cnpj/vcard` (Cartão de Contato .vcf)
+Gera arquivo de contato oficial compatível com iPhone, Android e Outlook para adicionar o CNPJ e o WhatsApp na agenda em 1 clique.
+
+---
+
 ## 💻 Exemplos em Outras Linguagens
 
 ### cURL

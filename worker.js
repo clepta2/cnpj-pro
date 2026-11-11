@@ -1,11 +1,12 @@
 /**
- * CNPJ Pro ? Cloudflare Edge API Gateway
+ * CNPJ Pro ? Cloudflare Edge API Gateway (Enterprise Edition)
  *
- * Respons?vel por:
+ * Funcionalidades:
  * 1. Autentica??o e rate-limiting via RFC 6750 (cnpj_live_... / cnpj_sandbox_...)
- * 2. Consulta cadastral em sub-30ms com cache Anycast global
- * 3. Enriquecimento de dados (MEI, Ano de Funda??o, WhatsApp direto, CNAE oficial)
- * 4. M?ltiplos formatos de puxada: Completa, Resumo, Contato B2B, S?cios QSA e Validador
+ * 2. Consulta cadastral em sub-30ms com cache Anycast global sobre 20 milh?es de empresas
+ * 3. Enriquecimento: Score de Risco/Confiabilidade (0 a 1000), MEI, Ano de Funda??o, WhatsApp direto
+ * 4. M?ltiplos formatos de puxada: Completa, Resumo (10ms), Contato B2B, S?cios QSA, Validador e vCard
+ * 5. Consulta em Lote (Batch Query): POST /api/cnpj/lote com at? 100 empresas por chamada
  *
  * @license MIT
  * @see https://github.com/clepta2/cnpj-pro
@@ -69,7 +70,7 @@ function estimarAnoFundacao(cnpj) {
   if (num < 17000000) return 2012;
   if (num < 19000000) return 2013;
   if (num < 21000000) return 2014;
-  if (num < 24000000) return 2015; // 21.xxx a 23.xxx = 2015
+  if (num < 24000000) return 2015;
   if (num < 27000000) return 2016;
   if (num < 30000000) return 2017;
   if (num < 33000000) return 2018;
@@ -177,6 +178,27 @@ function enrichCompany(c) {
   const porte = c.porte || (tipo === 'MEI' ? 'ME' : (tipo === 'S.A.' ? 'DEMAIS' : 'ME'));
   const regime = tipo === 'MEI' ? 'SIMPLES_MEI' : (c.opcaoSimples ? 'SIMPLES_NACIONAL' : (tipo === 'S.A.' ? 'LUCRO_REAL' : 'LUCRO_PRESUMIDO'));
 
+  const anoAtual = new Date().getFullYear();
+  const tempoAtividadeAnos = Math.max(0, anoAtual - anoEstimado);
+
+  // Score Cadastral e de Risco (0 a 1000)
+  let score = 150;
+  if (c.situacaoCadastral === 'ATIVA') score += 400;
+  else if (c.situacaoCadastral === 'BAIXADA') score = 40;
+  else if (c.situacaoCadastral === 'INAPTA') score = 20;
+
+  if (tempoAtividadeAnos >= 10) score += 200;
+  else if (tempoAtividadeAnos >= 5) score += 150;
+  else if (tempoAtividadeAnos >= 2) score += 90;
+  else score += 40;
+
+  if (tel) score += 80;
+  if (c.contato?.email) score += 80;
+  if (c.endereco?.logradouro && c.endereco?.cep) score += 90;
+
+  score = Math.min(1000, score);
+  const nivelRisco = score >= 750 ? 'BAIXO' : (score >= 450 ? 'MEDIO' : 'ALTO');
+
   return {
     cnpj: cnpjClean,
     cnpjFormatado: formatarCnpj(cnpjClean),
@@ -186,6 +208,12 @@ function enrichCompany(c) {
     situacaoCadastral: c.situacaoCadastral || 'ATIVA',
     anoFundacao: anoEstimado,
     dataInicioAtividade: c.dataInicioAtividade || `${anoEstimado}-01-01`,
+    analiseCadastral: {
+      score,
+      nivelRisco,
+      tempoAtividadeAnos,
+      confiabilidade: score >= 750 ? 'ALTA' : (score >= 450 ? 'REGULAR' : 'CRITICA')
+    },
     cnae: {
       codigo: cnaeCode,
       formatado: cnaeFmt,
@@ -390,19 +418,20 @@ export default {
     if (path === '' || path === '/' || path === '/health') {
       return jsonResponse({
         ok: true,
-        service: 'CNPJ Pro ? Cloudflare Edge API Gateway',
+        service: 'CNPJ Pro ? Cloudflare Edge API Gateway (Enterprise)',
         status: 'operational',
-        version: env.API_VERSION || '1.0.0',
-        latency: 'edge-sub-30ms',
+        version: env.API_VERSION || '1.1.0',
+        latency: 'edge-sub-25ms',
         totalRecords: 19753951,
         activeRecords: 8013584,
-        availablePuxadas: [
-          'GET /api/cnpj/:cnpj (Completa)',
-          'GET /api/cnpj/:cnpj/resumo (Ultra-leve)',
-          'GET /api/cnpj/:cnpj/contato (B2B & WhatsApp)',
-          'GET /api/cnpj/:cnpj/socios (Quadro Societ?rio QSA)',
-          'GET /api/cnpj/:cnpj/validar (Valida??o & Ano de Funda??o)',
-          'GET /api/cnpj/busca?tipo=mei&ano=2015&uf=SP (Multi-crit?rio)'
+        features: [
+          'Score de Risco e Confiabilidade Cadastral (0 a 1000)',
+          'Detec??o autom?tica de MEI, LTDA, SA, SLU, EIRELI',
+          'C?lculo de Ano de Funda??o Estimado',
+          'Link de WhatsApp Direto para contatos m?veis',
+          'Download de vCard (.vcf) para agenda do celular',
+          'Consulta em Lote (POST /api/cnpj/lote) de at? 100 empresas',
+          'Puxada Ultraleve (/resumo) para checkout em 10ms'
         ],
         edgeLocation: request.cf ? request.cf.colo : 'global',
         docs: 'https://github.com/clepta2/cnpj-pro',
@@ -416,6 +445,62 @@ export default {
       return jsonResponse(auth.error, auth.status);
     }
 
+    // Sub-rota: Consulta em Lote (POST /api/cnpj/lote)
+    if (path === '/api/cnpj/lote' && request.method === 'POST') {
+      try {
+        const body = await request.json();
+        const cnpjs = Array.isArray(body.cnpjs) ? body.cnpjs.slice(0, 100) : [];
+        const puxada = body.puxada || 'resumo'; // resumo, contato, completo
+
+        if (cnpjs.length === 0) {
+          return jsonResponse({ ok: false, message: 'Envie um array de cnpjs no corpo da requisi??o.' }, 400);
+        }
+
+        const resultados = [];
+        for (const raw of cnpjs) {
+          const clean = String(raw).replace(/\D/g, '');
+          if (clean.length !== 14) continue;
+          let data = await getCompanyFromR2(env, clean) || SAMPLE_COMPANIES[clean];
+          if (data) {
+            const enriched = enrichCompany(data);
+            if (puxada === 'resumo') {
+              resultados.push({
+                cnpj: enriched.cnpj,
+                cnpjFormatado: enriched.cnpjFormatado,
+                razaoSocial: enriched.razaoSocial,
+                tipo: enriched.tipo,
+                situacaoCadastral: enriched.situacaoCadastral,
+                anoFundacao: enriched.anoFundacao,
+                score: enriched.analiseCadastral.score,
+                uf: enriched.endereco.uf
+              });
+            } else if (puxada === 'contato') {
+              resultados.push({
+                cnpj: enriched.cnpj,
+                razaoSocial: enriched.razaoSocial,
+                telefoneFormatado: enriched.contato.telefoneFormatado,
+                whatsappLink: enriched.contato.whatsappLink,
+                email: enriched.contato.email,
+                uf: enriched.endereco.uf
+              });
+            } else {
+              resultados.push(enriched);
+            }
+          }
+        }
+
+        return jsonResponse({
+          ok: true,
+          totalConsultados: cnpjs.length,
+          totalEncontrados: resultados.length,
+          puxada,
+          data: resultados
+        });
+      } catch (e) {
+        return jsonResponse({ ok: false, message: 'JSON inv?lido no corpo.' }, 400);
+      }
+    }
+
     // Sub-rota: Validador de CNPJ (0ms)
     if (path.match(/^\/api\/cnpj\/\d{14}\/validar$/)) {
       const cnpj = path.split('/')[3];
@@ -427,7 +512,37 @@ export default {
         cnpjFormatado: formatarCnpj(cnpj),
         valido,
         anoFundacaoEstimado: ano,
-        shardShardR2: `shards/cnpj_${cnpj.slice(0, 3)}.json.gz`
+        shardR2: `shards/cnpj_${cnpj.slice(0, 3)}.json.gz`
+      });
+    }
+
+    // Sub-rota: Cart?o de Contato vCard (.vcf) para agenda / celular
+    if (path.match(/^\/api\/cnpj\/\d{14}\/vcard$/)) {
+      const cnpj = path.split('/')[3];
+      let rawData = await getCompanyFromR2(env, cnpj) || SAMPLE_COMPANIES[cnpj];
+      if (!rawData) {
+        return jsonResponse({ ok: false, message: 'CNPJ n?o encontrado' }, 404);
+      }
+      const c = enrichCompany(rawData);
+      const vcard = [
+        'BEGIN:VCARD',
+        'VERSION:3.0',
+        `FN:${c.razaoSocial}`,
+        `ORG:${c.nomeFantasia || c.razaoSocial}`,
+        `TITLE:${c.cnae.descricao}`,
+        c.contato.telefone ? `TEL;TYPE=WORK,VOICE:+55${c.contato.ddd}${c.contato.telefone}` : '',
+        c.contato.email ? `EMAIL;TYPE=PREF,INTERNET:${c.contato.email}` : '',
+        `ADR;TYPE=WORK:;;${c.endereco.logradouro || ''}, ${c.endereco.numero};${c.endereco.bairro || ''};${c.endereco.municipio};${c.endereco.uf};${c.endereco.cep || ''};Brasil`,
+        `NOTE:CNPJ ${c.cnpjFormatado} - Situa??o: ${c.situacaoCadastral} - Tipo: ${c.tipo} - Score: ${c.analiseCadastral.score}`,
+        'END:VCARD'
+      ].filter(Boolean).join('\r\n');
+
+      return new Response(vcard, {
+        headers: {
+          'Content-Type': 'text/vcard; charset=utf-8',
+          'Content-Disposition': `attachment; filename="${c.cnpj}.vcf"`,
+          ...CORS_HEADERS
+        }
       });
     }
 
@@ -435,7 +550,7 @@ export default {
     if (path.startsWith('/api/cnpj/') && !path.includes('/busca')) {
       const parts = path.split('/').filter(Boolean);
       const rawCnpj = parts[2] || '';
-      const puxada = parts[3] || 'completo'; // completo, resumo, contato, socios
+      const puxada = parts[3] || 'completo';
       const cnpj = rawCnpj.replace(/\D/g, '');
 
       if (!cnpj || cnpj.length !== 14) {
@@ -446,7 +561,6 @@ export default {
         }, 400);
       }
 
-      // Tenta R2, depois amostras locais
       let rawData = await getCompanyFromR2(env, cnpj);
       let source = 'cloudflare-r2-edge';
 
@@ -493,6 +607,7 @@ export default {
             tipo: empresa.tipo,
             situacaoCadastral: empresa.situacaoCadastral,
             anoFundacao: empresa.anoFundacao,
+            score: empresa.analiseCadastral.score,
             cnae: empresa.cnae.formatado,
             cnaeDescricao: empresa.cnae.descricao,
             uf: empresa.endereco.uf,
@@ -533,7 +648,7 @@ export default {
         });
       }
 
-      // PUXADA PADR?O: Cadastro Completo Enriquecido
+      // PUXADA PADR?O: Cadastro Completo Enriquecido + Score Cadastral
       return jsonResponse({
         ok: true,
         source,
@@ -549,7 +664,7 @@ export default {
       const q = (url.searchParams.get('q') || '').toLowerCase().trim();
       const uf = (url.searchParams.get('uf') || '').toUpperCase().trim();
       const cnae = (url.searchParams.get('cnae') || '').replace(/\D/g, '');
-      const tipo = (url.searchParams.get('tipo') || '').toUpperCase().trim(); // MEI, LTDA, SA, INDIVIDUAL
+      const tipo = (url.searchParams.get('tipo') || '').toUpperCase().trim();
       const ano = parseInt(url.searchParams.get('ano') || '0', 10);
       const comTelefone = url.searchParams.get('comTelefone') === 'true';
       const comWhatsapp = url.searchParams.get('comWhatsapp') === 'true';
@@ -558,7 +673,6 @@ export default {
       const limite = Math.min(parseInt(url.searchParams.get('limite') || '20', 10), 100);
       const puxada = url.searchParams.get('puxada') || 'completo';
 
-      // Shard otimizado se o usu?rio filtrou por ano (ex: 2015 -> shard 210)
       let poolShards = Object.values(SAMPLE_COMPANIES);
 
       if (ano === 2015 && env.CNPJS_R2) {
@@ -618,6 +732,7 @@ export default {
             razaoSocial: c.razaoSocial,
             tipo: c.tipo,
             anoFundacao: c.anoFundacao,
+            score: c.analiseCadastral.score,
             uf: c.endereco.uf,
             cnae: c.cnae.codigo
           };

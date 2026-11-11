@@ -123,6 +123,8 @@ export declare class CnpjPro {
   consultarContato(cnpj: string): Promise<ContatoB2BEmpresa>;
   consultarSocios(cnpj: string): Promise<{ ok: boolean; cnpj: string; razaoSocial: string; totalSocios: number; socios: Socio[] }>;
   validar(cnpj: string): Promise<ValidacaoCnpjResultado>;
+  obterVcardUrl(cnpj: string): string;
+  consultarLote(cnpjs: string[], options?: { puxada?: 'resumo' | 'contato' | 'completo' }): Promise<{ ok: boolean; totalConsultados: number; totalEncontrados: number; puxada: string; data: any[] }>;
   buscar(options?: BuscaCnpjOptions): Promise<RespostaBuscaCnpj>;
   validarDigito(cnpj: string): boolean;
   formatar(cnpj: string): string;

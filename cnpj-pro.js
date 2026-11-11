@@ -248,6 +248,43 @@
     }
 
     /**
+     * Retorna a URL direta para download do vCard (.vcf) para salvar na agenda
+     * @param {string} cnpj
+     * @returns {string}
+     */
+    obterVcardUrl(cnpj) {
+      const clean = this.limpar(cnpj);
+      return `${this.baseUrl}/api/cnpj/${clean}/vcard?key=${encodeURIComponent(this.apiKey)}`;
+    }
+
+    /**
+     * Consulta em Lote (Batch Query): enriquece até 100 CNPJs em uma única chamada HTTP
+     * @param {string[]} cnpjs - Array com os números de CNPJ
+     * @param {Object} [options]
+     * @param {'resumo'|'contato'|'completo'} [options.puxada='resumo']
+     * @returns {Promise<Object>}
+     */
+    async consultarLote(cnpjs = [], options = {}) {
+      if (!Array.isArray(cnpjs) || cnpjs.length === 0) {
+        throw new Error('Forneça um array com pelo menos um CNPJ.');
+      }
+      const url = `${this.baseUrl}/api/cnpj/lote`;
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: this._getHeaders(),
+        body: JSON.stringify({
+          cnpjs: cnpjs.map(c => this.limpar(c)),
+          puxada: options.puxada || 'resumo'
+        })
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message || `Erro no lote (HTTP ${res.status})`);
+      }
+      return res.json();
+    }
+
+    /**
      * Busca empresas por Razão Social, Nome Fantasia, CNAE, UF, Ano (ex: 2015), Tipo (MEI, LTDA) e Contato
      * @param {Object} options
      * @returns {Promise<Object>}
