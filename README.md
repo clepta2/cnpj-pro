@@ -97,63 +97,89 @@ x-api-key: cnpj_live_SEU_TOKEN_AQUI
 Base URL Oficial de Borda (Cloudflare Anycast):  
 `https://cnpj-pro-api.fichatecnica-api.workers.dev`
 
-### 1. `GET /api/cnpj/:cnpj`
-Retorna todos os dados cadastrais da empresa pelo número do CNPJ (14 dígitos).
+### 1. `GET /api/cnpj/:cnpj` (Cadastro Completo Enriquecido)
+Retorna todos os dados cadastrais detalhados, porte, regime tributário, CNAE decodificado, endereço e sócios.
 
-* **Parâmetro de URL:** `:cnpj` (com ou sem máscara)
-* **Exemplo de Resposta (200 OK):**
+---
+
+### 2. `GET /api/cnpj/:cnpj/resumo` (Puxada Ultraleve para Checkout)
+Retorna payload ultraleve (< 200 bytes) com apenas os dados essenciais para preenchimento de formulário em **10ms**:
 ```json
 {
   "ok": true,
   "data": {
     "cnpj": "48916772000100",
+    "cnpjFormatado": "48.916.772/0001-00",
     "razaoSocial": "OZPRO ENTERPRISE TECNOLOGIA LTDA",
     "nomeFantasia": "OZPRO CLOUD",
+    "tipo": "LTDA",
     "situacaoCadastral": "ATIVA",
-    "dataSituacaoCadastral": "2022-09-15",
-    "dataInicioAtividade": "2022-09-15",
-    "cnaePrincipal": "6201501",
-    "cnaePrincipalDescricao": "Desenvolvimento de programas de computador sob encomenda",
-    "naturezaJuridica": "206-2 - Sociedade Empresária Limitada",
-    "capitalSocial": 100000,
-    "porte": "ME",
-    "opcaoSimples": true,
-    "opcaoMei": false,
-    "endereco": {
-      "tipoLogradouro": "AVENIDA",
-      "logradouro": "PAULISTA",
-      "numero": "1000",
-      "complemento": "SALA 802",
-      "bairro": "BELA VISTA",
-      "cep": "01310100",
-      "uf": "SP",
-      "municipio": "SAO PAULO"
-    },
-    "contato": {
-      "ddd1": "11",
-      "telefone1": "32001000",
-      "email": "contato@ozpro.com.br"
-    },
-    "socios": [
-      {
-        "nome": "CLEBERSON NOVAIS",
-        "qualificacao": "49 - Sócio-Administrador"
-      }
-    ]
+    "anoFundacao": 2022,
+    "cnae": "62.01-5/01",
+    "cnaeDescricao": "Desenvolvimento de programas sob encomenda (SaaS)",
+    "uf": "SP",
+    "municipio": "SAO PAULO"
   }
 }
 ```
 
 ---
 
-### 2. `GET /api/cnpj/busca`
-Busca prospectiva por Razão Social, Nome Fantasia, CNAE e localização.
+### 3. `GET /api/cnpj/:cnpj/contato` (Puxada B2B, WhatsApp & Telemarketing)
+Retorna dados de contato higienizados, identificação de celular e **link direto para WhatsApp**:
+```json
+{
+  "ok": true,
+  "data": {
+    "cnpj": "48916772000100",
+    "razaoSocial": "OZPRO ENTERPRISE TECNOLOGIA LTDA",
+    "telefoneFormatado": "(11) 99682-6349",
+    "whatsappProvavel": true,
+    "whatsappLink": "https://wa.me/5511996826349",
+    "email": "contato@ozpro.com.br",
+    "enderecoCompleto": "AVENIDA PAULISTA, 1000 - BELA VISTA, SAO PAULO - SP, CEP 01310-100",
+    "socios": [{ "nome": "CLEBERSON NOVAIS", "qualificacao": "49 - Sócio-Administrador" }]
+  }
+}
+```
 
-* **Query Params:**
-  * `q` (string): Termo para busca por nome ou sócio.
-  * `uf` (string): Sigla do estado (ex: `"SP"`, `"RJ"`).
-  * `cnae` (string): Código CNAE (ex: `"6201501"`).
-  * `limite` (number): Quantidade de itens por página (máx: 100).
+---
+
+### 4. `GET /api/cnpj/:cnpj/socios` (Quadro Societário - QSA)
+Retorna os sócios e administradores registrados:
+```json
+{
+  "ok": true,
+  "data": {
+    "cnpj": "48916772000100",
+    "razaoSocial": "OZPRO ENTERPRISE TECNOLOGIA LTDA",
+    "totalSocios": 1,
+    "socios": [{ "nome": "CLEBERSON NOVAIS", "qualificacao": "49 - Sócio-Administrador" }]
+  }
+}
+```
+
+---
+
+### 5. `GET /api/cnpj/:cnpj/validar` (Validação & Ano de Fundação)
+Valida os dígitos verificadores pelo algoritmo módulo 11 da Receita Federal e calcula o ano de fundação estimado sem gastar créditos.
+
+---
+
+### 6. `GET /api/cnpj/busca` (Busca Multi-Critério)
+Busca prospectiva por Razão Social, CNAE, UF, Ano e Tipo Societário.
+
+* **Filtros Disponíveis:**
+  * `q` (string): Busca textual por nome ou sócio.
+  * `tipo` (string): Filtrar por natureza societária (`MEI`, `LTDA`, `SA`, `INDIVIDUAL`).
+  * `ano` (number): Filtrar por ano de abertura (ex: `ano=2015`).
+  * `uf` (string): Sigla do estado (ex: `"SP"`, `"RJ"`, `"MG"`).
+  * `cnae` (string): Código CNAE de atividade (ex: `"9511502"` para conserto de celular).
+  * `comWhatsapp` (boolean): `true` para retornar apenas empresas com celular móvel.
+  * `comTelefone` (boolean): `true` para retornar apenas empresas com telefone.
+  * `comEmail` (boolean): `true` para retornar apenas empresas com e-mail cadastrado.
+  * `puxada` (string): Formato do resultado (`completo`, `resumo` ou `contato`).
+  * `limite` (number): Quantidade máxima de resultados (padrão: 20, máx: 100).
 
 ---
 

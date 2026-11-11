@@ -57,18 +57,56 @@ export interface BuscaCnpjOptions {
   uf?: string;
   municipio?: string;
   cnae?: string;
-  situacao?: string;
-  apenasAtivas?: boolean;
+  tipo?: 'MEI' | 'LTDA' | 'SA' | 'INDIVIDUAL' | 'EIRELI' | 'SLU';
+  ano?: number;
+  situacao?: 'ATIVA' | 'BAIXADA' | 'INAPTA' | 'SUSPENSA';
+  comTelefone?: boolean;
+  comWhatsapp?: boolean;
+  comEmail?: boolean;
+  puxada?: 'completo' | 'resumo' | 'contato';
   limite?: number;
   pagina?: number;
 }
 
+export interface ResumoEmpresa {
+  cnpj: string;
+  cnpjFormatado: string;
+  razaoSocial: string;
+  nomeFantasia?: string;
+  tipo: string;
+  situacaoCadastral: string;
+  anoFundacao: number;
+  cnae: string;
+  cnaeDescricao: string;
+  uf: string;
+  municipio: string;
+}
+
+export interface ContatoB2BEmpresa {
+  cnpj: string;
+  razaoSocial: string;
+  telefoneFormatado?: string;
+  whatsappProvavel: boolean;
+  whatsappLink?: string;
+  email?: string;
+  enderecoCompleto: string;
+  socios: Socio[];
+}
+
+export interface ValidacaoCnpjResultado {
+  ok: boolean;
+  cnpj: string;
+  cnpjFormatado: string;
+  valido: boolean;
+  anoFundacaoEstimado: number;
+  shardShardR2: string;
+}
+
 export interface RespostaBuscaCnpj {
   ok: boolean;
-  total: number;
-  pagina: number;
-  limite: number;
-  data: DadosCadastraisEmpresa[];
+  totalRetornado: number;
+  filtrosAplicados: any;
+  data: any[];
 }
 
 export interface CnpjProClientConfig {
@@ -81,7 +119,11 @@ export interface CnpjProClientConfig {
 export declare class CnpjPro {
   constructor(config?: CnpjProClientConfig);
   consultar(cnpj: string): Promise<DadosCadastraisEmpresa>;
-  buscar(options: BuscaCnpjOptions): Promise<RespostaBuscaCnpj>;
+  consultarResumo(cnpj: string): Promise<ResumoEmpresa>;
+  consultarContato(cnpj: string): Promise<ContatoB2BEmpresa>;
+  consultarSocios(cnpj: string): Promise<{ ok: boolean; cnpj: string; razaoSocial: string; totalSocios: number; socios: Socio[] }>;
+  validar(cnpj: string): Promise<ValidacaoCnpjResultado>;
+  buscar(options?: BuscaCnpjOptions): Promise<RespostaBuscaCnpj>;
   validarDigito(cnpj: string): boolean;
   formatar(cnpj: string): string;
   limpar(cnpj: string): string;

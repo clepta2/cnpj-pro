@@ -205,7 +205,50 @@
     }
 
     /**
-     * Busca empresas por Razão Social, Nome Fantasia, CNAE, UF ou Município
+     * Puxada ultraleve (< 200 bytes) com dados essenciais para preenchimento de formulário em 10ms
+     * @param {string} cnpj
+     * @returns {Promise<Object>}
+     */
+    async consultarResumo(cnpj) {
+      const clean = this.limpar(cnpj);
+      if (!clean || clean.length !== 14) throw new Error('CNPJ inválido.');
+      return this._request(`/api/cnpj/${clean}/resumo`);
+    }
+
+    /**
+     * Puxada especializada para prospecção B2B / WhatsApp / Telemarketing
+     * @param {string} cnpj
+     * @returns {Promise<Object>}
+     */
+    async consultarContato(cnpj) {
+      const clean = this.limpar(cnpj);
+      if (!clean || clean.length !== 14) throw new Error('CNPJ inválido.');
+      return this._request(`/api/cnpj/${clean}/contato`);
+    }
+
+    /**
+     * Puxada direta do Quadro de Sócios e Administradores (QSA)
+     * @param {string} cnpj
+     * @returns {Promise<Object>}
+     */
+    async consultarSocios(cnpj) {
+      const clean = this.limpar(cnpj);
+      if (!clean || clean.length !== 14) throw new Error('CNPJ inválido.');
+      return this._request(`/api/cnpj/${clean}/socios`);
+    }
+
+    /**
+     * Validação matemática com cálculo de ano de fundação estimado
+     * @param {string} cnpj
+     * @returns {Promise<Object>}
+     */
+    async validar(cnpj) {
+      const clean = this.limpar(cnpj);
+      return this._request(`/api/cnpj/${clean}/validar`);
+    }
+
+    /**
+     * Busca empresas por Razão Social, Nome Fantasia, CNAE, UF, Ano (ex: 2015), Tipo (MEI, LTDA) e Contato
      * @param {Object} options
      * @returns {Promise<Object>}
      */
