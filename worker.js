@@ -144,6 +144,37 @@ function validateAuth(request, env) {
   };
 }
 
+const SHARD_RAM_CACHE = new Map();
+
+async function getCompanyFromR2(env, cnpj) {
+  if (!env || !env.CNPJS_R2) return null;
+  const clean = String(cnpj).replace(/\D/g, '');
+  if (clean.length !== 14) return null;
+  const prefix = clean.slice(0, 3);
+  const shardKey = `shards/cnpj_${prefix}.json.gz`;
+
+  let shardData = SHARD_RAM_CACHE.get(shardKey);
+  if (!shardData) {
+    try {
+      const object = await env.CNPJS_R2.get(shardKey);
+      if (object) {
+        const ds = new DecompressionStream('gzip');
+        const stream = object.body.pipeThrough(ds);
+        const text = await new Response(stream).text();
+        shardData = JSON.parse(text);
+
+        if (SHARD_RAM_CACHE.size > 25) {
+          const first = SHARD_RAM_CACHE.keys().next().value;
+          SHARD_RAM_CACHE.delete(first);
+        }
+        SHARD_RAM_CACHE.set(shardKey, shardData);
+      }
+    } catch (_) {}
+  }
+
+  return (shardData && shardData[clean]) || null;
+}
+
 export default {
   async fetch(request, env, ctx) {
     if (request.method === 'OPTIONS') {
@@ -187,6 +218,20 @@ export default {
         }, 400);
       }
 
+      // 1. Tenta carregar do shard do Cloudflare R2
+      const r2Company = await getCompanyFromR2(env, cnpj);
+      if (r2Company) {
+        return jsonResponse({
+          ok: true,
+          source: 'cloudflare-r2-edge',
+          sandbox: false,
+          data: r2Company
+        }, 200, {
+          'Cache-Control': 'public, max-age=604800, s-maxage=2592000, stale-while-revalidate=86400'
+        });
+      }
+
+      // 2. Amostras locais
       const found = SAMPLE_COMPANIES[cnpj];
       if (found) {
         return jsonResponse({

@@ -4,6 +4,11 @@ compatibility_date = "2026-10-01"
 account_id = "10db5eac4dab12f6842b855a953d3018"
 workers_dev = true
 
+# Bucket R2 para armazenar os Shards dos 20 Milhões de CNPJs
+[[r2_buckets]]
+binding = "CNPJS_R2"
+bucket_name = "cnpjs-pro"
+
 [observability]
 enabled = true
 
