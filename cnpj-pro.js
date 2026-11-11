@@ -17,7 +17,7 @@
 })(typeof globalThis !== 'undefined' ? globalThis : this, function () {
   'use strict';
 
-  const DEFAULT_BASE_URL = 'https://cnpj-pro-api.fichatecnica-api.workers.dev';
+  const DEFAULT_BASE_URL = 'https://ponte.ozpro.com.br';
   const DEFAULT_TIMEOUT = 10000;
 
   // Modelo de amostra para testes em modo Sandbox (sem chave de produção)

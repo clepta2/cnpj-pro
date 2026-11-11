@@ -95,7 +95,7 @@ x-api-key: cnpj_live_SEU_TOKEN_AQUI
 ## 📡 Endpoints da API
 
 Base URL Oficial de Borda (Cloudflare Anycast):  
-`https://cnpj-pro-api.fichatecnica-api.workers.dev`
+`https://ponte.ozpro.com.br`
 
 ### 1. `GET /api/cnpj/:cnpj` (Cadastro Completo Enriquecido)
 Retorna todos os dados cadastrais detalhados, porte, regime tributário, CNAE decodificado, endereço, sócios e o bloco de **Validação de Empresa Real (Score de Legitimidade)**:
@@ -238,7 +238,7 @@ Gera arquivo de contato oficial compatível com iPhone, Android e Outlook para a
 ### cURL
 
 ```bash
-curl -X GET "https://cnpj-pro-api.fichatecnica-api.workers.dev/api/cnpj/48916772000100" \
+curl -X GET "https://ponte.ozpro.com.br/api/cnpj/48916772000100" \
   -H "Authorization: ****** \
   -H "Accept: application/json"
 ```
@@ -249,7 +249,7 @@ curl -X GET "https://cnpj-pro-api.fichatecnica-api.workers.dev/api/cnpj/48916772
 import requests
 
 cnpj = "48916772000100"
-url = f"https://cnpj-pro-api.fichatecnica-api.workers.dev/api/cnpj/{cnpj}"
+url = f"https://ponte.ozpro.com.br/api/cnpj/{cnpj}"
 headers = {
     "Authorization": "******",
     "Accept": "application/json"
@@ -265,7 +265,7 @@ print(f"Razão: {empresa['razaoSocial']} | Status: {empresa['situacaoCadastral']
 ```php
 <?php
 $apiKey = "cnpj_live_SEU_TOKEN";
-$ch = curl_init("https://cnpj-pro-api.fichatecnica-api.workers.dev/api/cnpj/48916772000100");
+$ch = curl_init("https://ponte.ozpro.com.br/api/cnpj/48916772000100");
 curl_setopt($ch, CURLOPT_HTTPHEADER, [
     "Authorization: ****** . $apiKey,
     "Accept: application/json"
