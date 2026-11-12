@@ -40,7 +40,7 @@ function saveToMemoryCache(cnpj, data) {
   });
 }
 
-// ─── Rate Limiter (Proteção de Cota & Anti-Scraping: 1 req/s para Free = 86.400/dia máx) ───
+// ─── Rate Limiter local por isolate (não representa uma cota diária global) ───
 const ipBuckets = new Map();
 
 function checkRateLimit(ipOrKey, limit = 60, windowMs = 60000) {
@@ -318,14 +318,14 @@ export default {
     const isPro = cleanKey.length >= 8; // Chave Pro ativa
     const clientIp = request.headers.get('CF-Connecting-IP') || request.headers.get('x-real-ip') || '127.0.0.1';
 
-    // 4. Rate Limiting: 1 req/s para Free (86.400 req/dia cravados) | 300 req/min para Pro
+    // O contador é local ao isolate; lotes permitem várias consultas por requisição.
     const maxReqs = isPro ? 300 : 60;
     const rl = checkRateLimit(isPro ? cleanKey : clientIp, maxReqs, 60000);
 
     if (!rl.ok && path !== '/' && path !== '/health' && path !== '/demo') {
       return new Response(JSON.stringify({
         ok: false,
-        error: 'Limite de requisições excedido. Limite do plano gratuito: 1 req/segundo (60 req/min). Para vazão ilimitada, utilize sua chave x-api-key Pro.',
+        error: 'Limite temporário de requisições excedido. Aguarde o período indicado em Retry-After.',
         retryAfterSeconds: Math.ceil((rl.resetAt - Date.now()) / 1000)
       }, null, 2), {
         status: 429,
@@ -349,9 +349,9 @@ export default {
         status: 'online',
         autenticado: isPro,
         plano: isPro ? 'Pro / Enterprise' : 'Gratuito / Básico',
-        baseTotal: '19.753.951 empresas cadastradas',
-        baseAtivas: '8.013.584 empresas ativas',
-        armazenamento: 'Cloudflare R2 Sharded + KV Edge RAM',
+        baseTotal: 'não verificada no armazenamento publicado',
+        baseAtivas: 'não verificada no armazenamento publicado',
+        armazenamento: 'RAM/KV quando populados; fallback BrasilAPI; leitura dos shards R2 ainda não implementada',
         latency: 'sub-25ms',
         github: 'https://github.com/clepta2/cnpj-pro',
         edgeLocation: request.cf ? request.cf.colo : 'Edge',
@@ -409,6 +409,78 @@ export default {
       const validacao = validarDigitoCnpj(raw);
       return new Response(JSON.stringify({ ok: true, ...validacao, timestamp: new Date().toISOString() }, null, 2), {
         status: validacao.valido ? 200 : 422,
+        headers: { 'Content-Type': 'application/json; charset=utf-8', ...CORS_HEADERS }
+      });
+    }
+
+    // Consulta em lote antes da rota genérica /api/cnpj/:cnpj.
+    if (path === '/api/cnpj/lote') {
+      if (request.method !== 'POST') {
+        return new Response(JSON.stringify({ ok: false, error: 'Use POST com um array "cnpjs".' }), {
+          status: 405,
+          headers: { 'Content-Type': 'application/json; charset=utf-8', ...CORS_HEADERS }
+        });
+      }
+
+      const lista = bodyJson && Array.isArray(bodyJson.cnpjs) ? bodyJson.cnpjs : null;
+      if (!lista || lista.length === 0) {
+        return new Response(JSON.stringify({ ok: false, error: 'Envie um array não vazio "cnpjs" no corpo JSON.' }), {
+          status: 400,
+          headers: { 'Content-Type': 'application/json; charset=utf-8', ...CORS_HEADERS }
+        });
+      }
+
+      const maxItems = isPro ? 50 : 5;
+      if (lista.length > maxItems) {
+        return new Response(JSON.stringify({
+          ok: false,
+          error: `O lote aceita até ${maxItems} CNPJs por requisição neste plano.`,
+          maxItems
+        }), {
+          status: 413,
+          headers: { 'Content-Type': 'application/json; charset=utf-8', ...CORS_HEADERS }
+        });
+      }
+
+      const resultados = [];
+      for (let i = 0; i < lista.length; i += 5) {
+        const loteAtual = lista.slice(i, i + 5);
+        const resolucoes = await Promise.all(loteAtual.map(async (item) => {
+          const cnpj = String(item || '').replace(/\D/g, '');
+          if (cnpj.length !== 14) {
+            return { cnpj: String(item), ok: false, error: 'CNPJ inválido: são necessários 14 dígitos.' };
+          }
+          const validacao = validarDigitoCnpj(cnpj);
+          if (!validacao.valido) {
+            return { cnpj, ok: false, error: `CNPJ inválido: ${validacao.motivo}` };
+          }
+          const resolucao = await resolverCnpj(cnpj, env);
+          if (!resolucao || !resolucao.data) {
+            return { cnpj, ok: false, error: 'Empresa não localizada.' };
+          }
+          const dados = resolucao.data;
+          return {
+            cnpj,
+            ok: true,
+            ...(isPro ? { data: dados } : {
+              razaoSocial: dados.razaoSocial,
+              situacaoCadastral: dados.situacaoCadastral,
+              cnae: dados.cnaePrincipal,
+              uf: dados.endereco.uf,
+              municipio: dados.endereco.municipio
+            })
+          };
+        }));
+        resultados.push(...resolucoes);
+      }
+
+      return new Response(JSON.stringify({
+        ok: true,
+        totalSolicitado: lista.length,
+        totalEncontrado: resultados.filter((item) => item.ok).length,
+        resultados
+      }, null, 2), {
+        status: 200,
         headers: { 'Content-Type': 'application/json; charset=utf-8', ...CORS_HEADERS }
       });
     }
@@ -618,47 +690,6 @@ export default {
         status: 200,
         headers: { 'Content-Type': 'application/json; charset=utf-8', ...CORS_HEADERS }
       });
-    }
-
-    // 9. Consulta em Lote (/api/cnpj/lote)
-    if (path === '/api/cnpj/lote' && request.method === 'POST') {
-      try {
-        const body = await request.json();
-        const lista = Array.isArray(body.cnpjs) ? body.cnpjs.slice(0, isPro ? 50 : 5) : [];
-        const resultados = [];
-
-        for (const item of lista) {
-          const c = String(item).replace(/\D/g, '');
-          if (c.length === 14) {
-            const res = await resolverCnpj(c, env);
-            if (res && res.data) {
-              resultados.push(isPro ? res.data : {
-                cnpj: res.data.cnpj,
-                razaoSocial: res.data.razaoSocial,
-                situacaoCadastral: res.data.situacaoCadastral,
-                cnae: res.data.cnaePrincipal,
-                uf: res.data.endereco.uf,
-                municipio: res.data.endereco.municipio
-              });
-            }
-          }
-        }
-
-        return new Response(JSON.stringify({
-          ok: true,
-          totalConsultado: lista.length,
-          totalEncontrado: resultados.length,
-          resultados
-        }, null, 2), {
-          status: 200,
-          headers: { 'Content-Type': 'application/json; charset=utf-8', ...CORS_HEADERS }
-        });
-      } catch (err) {
-        return new Response(JSON.stringify({ ok: false, error: 'JSON inválido no corpo da requisição.' }), {
-          status: 400,
-          headers: { 'Content-Type': 'application/json; charset=utf-8', ...CORS_HEADERS }
-        });
-      }
     }
 
     return new Response(JSON.stringify({ ok: false, error: 'Rota não encontrada. Consulte /health ou /demo.' }), {

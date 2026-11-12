@@ -2,7 +2,7 @@
  * test.js
  * Bateria de Testes Unitários e Validação Criptográfica do CNPJ Pro
  */
-import { validarDigitoCnpj } from './worker.js';
+import worker, { validarDigitoCnpj } from './worker.js';
 
 let passed = 0;
 let failed = 0;
@@ -47,6 +47,46 @@ assert(fakeTam.valido === false, 'Rejeita CNPJs com tamanho menor que 14 dígito
 // 3. Formatação Canônica
 console.log('\n--- 3. Formatação Canônica ---');
 assert(c1.cnpjFormatado === '33.000.167/0001-01', 'Formata com máscara oficial');
+
+// 4. Rota de lote e limites de payload
+console.log('\n--- 4. Rota de Consulta em Lote ---');
+const loteResponse = await worker.fetch(new Request('https://api.test/api/cnpj/lote', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ cnpjs: ['invalido'] })
+}), {});
+const loteBody = await loteResponse.json();
+assert(loteResponse.status === 200, 'A rota de lote não é interceptada pela consulta individual');
+assert(loteBody.totalSolicitado === 1 && loteBody.resultados[0].ok === false, 'A resposta do lote informa o erro do item solicitado');
+
+const cnpjTeste = '00000000000191';
+const sucessoLoteResponse = await worker.fetch(new Request('https://api.test/api/cnpj/lote', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ cnpjs: [cnpjTeste] })
+}), {
+  CNPJ_KV: {
+    get: async (key) => key === cnpjTeste ? {
+      cnpj: cnpjTeste,
+      razaoSocial: 'Empresa de teste',
+      situacaoCadastral: 'ATIVA',
+      cnaePrincipal: '0000000',
+      endereco: { uf: 'SP', municipio: 'São Paulo' }
+    } : null
+  }
+});
+const sucessoLoteBody = await sucessoLoteResponse.json();
+assert(sucessoLoteBody.totalEncontrado === 1 && sucessoLoteBody.resultados[0].cnpj === cnpjTeste, 'O lote retorna apenas o registro solicitado encontrado no KV');
+
+const limiteResponse = await worker.fetch(new Request('https://api.test/api/cnpj/lote', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ cnpjs: Array(6).fill('invalido') })
+}), {});
+assert(limiteResponse.status === 413, 'O lote gratuito acima de cinco itens é rejeitado claramente');
+
+const metodoResponse = await worker.fetch(new Request('https://api.test/api/cnpj/lote'), {});
+assert(metodoResponse.status === 405, 'A rota de lote exige POST');
 
 console.log(`\n📊 Resultado dos Testes: ${passed} passaram, ${failed} falharam.\n`);
 

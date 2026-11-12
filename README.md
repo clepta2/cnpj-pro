@@ -1,10 +1,8 @@
 # 🏢 CNPJ Pro — SDK & API de Consulta Cadastral de Empresas
 
-> **API REST de alta performance em Cloudflare Edge para consulta cadastral, situação na Receita Federal, quadro societário (QSA), CNAEs e endereço de 20 milhões de empresas brasileiras.**
+> **API REST em Cloudflare Edge para consulta cadastral de CNPJ, com cache RAM/KV quando disponível e fallback para a BrasilAPI. A disponibilidade de uma base própria completa não está confirmada.**
 
 [![Status](https://img.shields.io/badge/Status-Cloudflare%20Edge%20API-success.svg)](#)
-[![Empresas](https://img.shields.io/badge/Base-19.753.951%20Empresas-blue.svg)](#)
-[![Ativas](https://img.shields.io/badge/Ativas-8.013.584%20Empresas-emerald.svg)](#)
 [![Latency](https://img.shields.io/badge/Latência-<30ms-cyan.svg)](#)
 [![Auth](https://img.shields.io/badge/Auth-RFC%206750%20Bearer-orange.svg)](#)
 [![License](https://img.shields.io/badge/License-MIT%20SDK-purple.svg)](LICENSE)
@@ -13,7 +11,7 @@
 
 ## ⚡ O que é o CNPJ Pro?
 
-O **CNPJ Pro** é um microsserviço em nuvem da OZPro Enterprise que transforma a base aberta completa da Receita Federal em uma **API de borda Anycast ultrarrápida (<30ms de latência)** com dados higienizados e indexados.
+O **CNPJ Pro** é um microsserviço em nuvem da OZPro Enterprise que consulta dados cadastrais por meio do cache disponível e de um fallback externo. A base completa anunciada anteriormente não foi verificada no armazenamento publicado.
 
 Criado para abastecer **ERPs, CRMs, sistemas de checkout, prevenção a fraudes, onboarding de clientes e automações B2B de WhatsApp**, o CNPJ Pro evita que sua aplicação precise manter bancos de dados gigantescos (+12 GB) localmente.
 
@@ -214,31 +212,32 @@ Busca prospectiva por Razão Social, CNAE, UF, Ano e Tipo Societário.
 ---
 
 ### 7. `POST /api/cnpj/lote` (Consulta em Lote - Batch)
-Envia até 100 CNPJs em uma única requisição HTTP para enriquecimento massivo de cadastros:
+Consulta somente os CNPJs enviados na requisição. O limite é de 50 itens por chamada no plano Pro e 5 no gratuito:
 ```json
 // POST /api/cnpj/lote
 {
-  "cnpjs": ["48916772000100", "33000167000101", "00000000000191"],
-  "puxada": "resumo"
+  "cnpjs": ["33000167000101", "00000000000191"]
 }
 ```
-* **Resposta (200 OK):**
+```bash
+curl -X POST "https://cnpj-pro-api.maputo3.workers.dev/api/cnpj/lote" \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: SUA_CHAVE_PRO" \
+  -d '{"cnpjs":["33000167000101","00000000000191"]}'
+```
+Cada entrada recebe seu próprio resultado ou erro; itens não solicitados não são retornados. A resposta Pro contém os dados completos dos CNPJs pedidos; no plano gratuito, os campos sensíveis permanecem limitados.
+
+O limitador atual conta requisições em memória por isolate da Cloudflare. Ele não é uma cota diária global e a capacidade real depende da distribuição dos Workers.
+
+* **Formato da resposta (200 OK):**
 ```json
 {
   "ok": true,
-  "totalConsultados": 3,
-  "totalEncontrados": 3,
-  "puxada": "resumo",
-  "data": [
-    {
-      "cnpj": "48916772000100",
-      "razaoSocial": "OZPRO ENTERPRISE TECNOLOGIA LTDA",
-      "tipo": "LTDA",
-      "situacaoCadastral": "ATIVA",
-      "anoFundacao": 2022,
-      "score": 890,
-      "uf": "SP"
-    }
+  "totalSolicitado": 2,
+  "totalEncontrado": 1,
+  "resultados": [
+    { "cnpj": "33000167000101", "ok": false, "error": "Empresa não localizada." },
+    { "cnpj": "00000000000191", "ok": false, "error": "CNPJ inválido: ..." }
   ]
 }
 ```
