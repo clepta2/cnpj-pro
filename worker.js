@@ -296,12 +296,20 @@ export default {
       return new Response(null, { status: 204, headers: CORS_HEADERS });
     }
 
-    // 2. Blindagem HTTP
+    // 2. Blindagem HTTP (Apenas GET e POST são autorizados; PUT/DELETE/PATCH são rejeitados com 405)
     if (request.method !== 'GET' && request.method !== 'POST') {
-      return new Response(JSON.stringify({ ok: false, error: 'Método não permitido.' }), {
+      return new Response(JSON.stringify({ ok: false, error: 'Método não permitido. Esta API opera estritamente com GET e POST.' }), {
         status: 405,
         headers: { 'Content-Type': 'application/json; charset=utf-8', ...CORS_HEADERS }
       });
+    }
+
+    // Leitura resiliente do corpo JSON em requisições POST
+    let bodyJson = null;
+    if (request.method === 'POST') {
+      try {
+        bodyJson = await request.json();
+      } catch (_) {}
     }
 
     // 3. Autenticação & Gatekeeper Tiering
@@ -383,10 +391,21 @@ export default {
       });
     }
 
-    // 7. Validação Matemática Isolada (/api/cnpj/:cnpj/validar)
-    if (path.startsWith('/api/cnpj/') && path.endsWith('/validar')) {
-      const parts = path.split('/');
-      const raw = parts[3];
+    // 7. Validação Matemática de Validade do CNPJ (GET & POST em sub-1ms)
+    const isValRoute = path === '/api/validar-cnpj' ||
+                       path === '/api/cnpj/validar' ||
+                       (path.startsWith('/api/cnpj/') && path.endsWith('/validar'));
+
+    if (isValRoute) {
+      let raw = url.searchParams.get('cnpj') || url.searchParams.get('valor') || url.searchParams.get('codigo') || '';
+      if (!raw && bodyJson) {
+        raw = bodyJson.cnpj || bodyJson.valor || bodyJson.codigo || '';
+      }
+      if (!raw && path.startsWith('/api/cnpj/')) {
+        const parts = path.split('/');
+        if (parts[3] && parts[3] !== 'validar') raw = parts[3];
+        else if (parts[2] && parts[2] !== 'validar') raw = parts[2];
+      }
       const validacao = validarDigitoCnpj(raw);
       return new Response(JSON.stringify({ ok: true, ...validacao, timestamp: new Date().toISOString() }, null, 2), {
         status: validacao.valido ? 200 : 422,
@@ -394,11 +413,27 @@ export default {
       });
     }
 
-    // 8. Consulta de CNPJ (/api/cnpj/:cnpj e sub-rotas)
-    if (path.startsWith('/api/cnpj/')) {
-      const subParts = path.replace('/api/cnpj/', '').split('/');
-      const cnpjClean = subParts[0].replace(/\D/g, '');
-      const subAction = subParts[1] || '';
+    // 8. Consulta de CNPJ (GET & POST e sub-rotas /resumo, /contato, /socios, /vcard)
+    if (path === '/api/cnpj' || path.startsWith('/api/cnpj/')) {
+      let cnpjRaw = '';
+      let subAction = '';
+
+      if (path === '/api/cnpj' || path === '/api/cnpj/') {
+        if (bodyJson) {
+          cnpjRaw = bodyJson.cnpj || bodyJson.valor || '';
+          subAction = bodyJson.puxada || bodyJson.tipo || '';
+        }
+        if (!cnpjRaw) {
+          cnpjRaw = url.searchParams.get('cnpj') || url.searchParams.get('q') || '';
+          subAction = url.searchParams.get('puxada') || '';
+        }
+      } else {
+        const subParts = path.replace('/api/cnpj/', '').split('/');
+        cnpjRaw = subParts[0];
+        subAction = subParts[1] || '';
+      }
+
+      const cnpjClean = String(cnpjRaw || '').replace(/\D/g, '');
 
       if (cnpjClean.length !== 14) {
         return new Response(JSON.stringify({
