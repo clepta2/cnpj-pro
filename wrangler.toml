@@ -1,0 +1,22 @@
+name = "cnpj-pro-api"
+main = "worker.js"
+compatibility_date = "2026-10-01"
+workers_dev = true
+
+[observability]
+enabled = true
+
+[[r2_buckets]]
+binding = "CNPJ_R2"
+bucket_name = "cnpj-pro"
+
+[[kv_namespaces]]
+binding = "CNPJ_KV"
+id = "648381bbc9a54d94b659aae6993d49c6"
+
+[vars]
+SERVICE_NAME = "CNPJ Pro API"
+ENVIRONMENT = "production"
+GITHUB_REPO = "clepta2/cnpj-pro"
+DOCS_URL = "https://github.com/clepta2/cnpj-pro"
+API_VERSION = "1.0.0"

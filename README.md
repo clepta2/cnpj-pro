@@ -95,7 +95,24 @@ x-api-key: cnpj_live_SEU_TOKEN_AQUI
 ## 📡 Endpoints da API
 
 Base URL Oficial de Borda (Cloudflare Anycast):  
-`https://ponte.ozpro.com.br`
+`https://cnpj-pro-api.maputo3.workers.dev`
+
+### Exemplos Diretos com cURL:
+
+```bash
+# Consulta pública com dados mascarados (1 req/segundo)
+curl -X GET "https://cnpj-pro-api.maputo3.workers.dev/api/cnpj/33000167000101"
+
+# Consulta completa desmascarada (Requer Chave Pro)
+curl -X GET "https://cnpj-pro-api.maputo3.workers.dev/api/cnpj/33000167000101" \
+  -H "x-api-key: SUA_CHAVE_PRO"
+
+# Validação instantânea de Dígito Verificador (<1ms)
+curl -X GET "https://cnpj-pro-api.maputo3.workers.dev/api/cnpj/33000167000101/validar"
+
+# Puxada ultraleve para Checkout (<200 bytes)
+curl -X GET "https://cnpj-pro-api.maputo3.workers.dev/api/cnpj/33000167000101/resumo"
+```
 
 ### 1. `GET /api/cnpj/:cnpj` (Cadastro Completo Enriquecido)
 Retorna todos os dados cadastrais detalhados, porte, regime tributário, CNAE decodificado, endereço, sócios e o bloco de **Validação de Empresa Real (Score de Legitimidade)**:

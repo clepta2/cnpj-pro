@@ -3,9 +3,11 @@
   "version": "1.0.0",
   "description": "SDK oficial para integracao com a API CNPJ Pro - Consulta cadastral, socios, CNAE e situacao fiscal de 20 milhoes de empresas brasileiras.",
   "main": "cnpj-pro.js",
+  "type": "module",
   "types": "types/index.d.ts",
   "scripts": {
-    "test": "node -e \"console.log('CNPJ Pro SDK OK')\""
+    "test": "node test.js",
+    "deploy": "wrangler deploy"
   },
   "keywords": [
     "cnpj",
