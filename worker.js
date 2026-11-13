@@ -347,6 +347,21 @@ export default {
       });
     }
 
+    // 4.1 Verifica??o de Cache Anycast Nativo Cloudflare (Sub-2ms)
+    const hasEdgeCache = typeof caches !== 'undefined' && caches.default && request.method === 'GET';
+    const cacheKey = hasEdgeCache ? new Request(url.toString(), { method: 'GET' }) : null;
+    if (hasEdgeCache && !path.includes('/health') && !path.includes('/status') && path !== '/' && path !== '/demo') {
+      try {
+        const cached = await caches.default.match(cacheKey);
+        if (cached) {
+          const res = new Response(cached.body, cached);
+          res.headers.set('CF-Cache-Status', 'HIT');
+          res.headers.set('X-Edge-Cache', 'HIT (<2ms Anycast RAM)');
+          return res;
+        }
+      } catch (_) {}
+    }
+
     // 5. Healthcheck Oficial
     if (path === '/health' || path === '/status') {
       return new Response(JSON.stringify({
@@ -728,10 +743,20 @@ export default {
         timestamp: new Date().toISOString()
       };
 
-      return new Response(JSON.stringify(respostaPro, null, 2), {
+      const response = new Response(JSON.stringify(respostaPro, null, 2), {
         status: 200,
-        headers: { 'Content-Type': 'application/json; charset=utf-8', ...CORS_HEADERS }
+        headers: {
+          'Content-Type': 'application/json; charset=utf-8',
+          'Cache-Control': 'public, max-age=3600, s-maxage=86400, stale-while-revalidate=3600',
+          'CF-Cache-Status': 'MISS',
+          'X-Edge-Cache': 'MISS (Anycast origin)',
+          ...CORS_HEADERS
+        }
       });
+      if (hasEdgeCache && ctx && typeof ctx.waitUntil === 'function') {
+        ctx.waitUntil(caches.default.put(cacheKey, response.clone()));
+      }
+      return response;
     }
 
     return new Response(JSON.stringify({ ok: false, error: 'Rota não encontrada. Consulte /health ou /demo.' }), {
