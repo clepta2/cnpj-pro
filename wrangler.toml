@@ -6,9 +6,9 @@ workers_dev = true
 [observability]
 enabled = true
 
-[[r2_buckets]]
-binding = "CNPJ_R2"
-bucket_name = "cnpj-pro"
+# [[r2_buckets]]
+# binding = "CNPJ_R2"
+# bucket_name = "cnpj-pro"
 
 [[kv_namespaces]]
 binding = "CNPJ_KV"
