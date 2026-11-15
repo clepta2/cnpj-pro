@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR" data-theme="dark">
+<html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Manrope:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=3.2.0" />
+  <link rel="stylesheet" href="styles.css?v=4.0.0" />
   <script>
     (function() {
       const savedTheme = localStorage.getItem('ponte.theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
@@ -184,82 +184,14 @@
       padding: 24px;
       box-shadow: var(--shadow-sm);
     }
-  
-.mobile-hamburger-btn {
-  display: none;
-  width: 36px;
-  height: 36px;
-  border-radius: var(--radius-md);
-  background: var(--paper);
-  border: 1px solid var(--line);
-  color: var(--ink);
-  place-items: center;
-  cursor: pointer;
-  margin-right: 8px;
-  flex-shrink: 0;
-  transition: all 0.15s ease;
-}
-.mobile-hamburger-btn:hover {
-  background: var(--paper-elevated);
-}
-.sidebar-drawer-backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 98;
-  background: rgba(0, 0, 0, 0.65);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-  transition: opacity 0.2s ease;
-}
-.sidebar-drawer-backdrop[hidden] {
-  display: none !important;
-}
-.sidebar-drawer-close {
-  display: none;
-  position: absolute;
-  top: 14px;
-  right: 14px;
-  width: 32px;
-  height: 32px;
-  border-radius: 6px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  color: #fff;
-  place-items: center;
-  cursor: pointer;
-}
-@media (max-width: 850px) {
-  .mobile-hamburger-btn {
-    display: grid !important;
-  }
-  .sidebar-drawer-close {
-    display: grid !important;
-  }
-  .sidebar {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    bottom: 0 !important;
-    width: 280px !important;
-    max-width: 85vw !important;
-    z-index: 100 !important;
-    transform: translateX(-100%);
-    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
-    display: flex !important;
-    box-shadow: 0 25px 60px -10px rgba(0,0,0,0.85) !important;
-  }
-  .sidebar.is-open {
-    transform: translateX(0) !important;
-  }
-}
-
   </style>
 </head>
 <body>
   <div class="sidebar-drawer-backdrop" id="sidebar-drawer-backdrop" hidden></div>
   <div class="app-shell">
     <!-- Sidebar Oficial do Ecossistema Ponte / OZPro -->
-    <aside class="sidebar"><button class="sidebar-drawer-close" id="sidebar-drawer-close" aria-label="Fechar menu"><i data-lucide="x"></i></button> aria-label="Navegação principal">
+    <aside class="sidebar" aria-label="Navegação principal">
+      <button class="sidebar-drawer-close" id="sidebar-drawer-close" aria-label="Fechar menu lateral"><i data-lucide="x"></i></button>
       <a class="brand" href="#consulta" aria-label="Ponte API, CNPJ Pro">
         <img src="brand/ozpro-mark.svg" alt="Ponte API Logo" style="width:38px;height:38px;border-radius:10px;object-fit:contain;background:var(--mint);padding:4px;box-shadow:0 4px 12px rgba(163,230,53,0.35);" />
         <span><strong>ponte</strong><small>CNPJ PRO · OZPRO</small></span>
@@ -311,7 +243,8 @@
     <!-- Área Principal -->
     <main class="main-area">
       <!-- Topbar Oficial -->
-      <header class="topbar"><button class="mobile-hamburger-btn" id="mobile-hamburger-btn" aria-label="Abrir menu"><i data-lucide="menu"></i></button>
+      <header class="topbar">
+        <button class="mobile-hamburger-btn" id="mobile-hamburger-btn" aria-label="Abrir menu lateral"><i data-lucide="menu"></i></button>
         <div class="breadcrumb">
           <span>Workspace</span>
           <i data-lucide="chevron-right"></i>
@@ -429,7 +362,7 @@
 
                 <!-- Tabela de Raio-X Cadastral -->
                 <div style="border:1px solid var(--line);border-radius:var(--radius-lg);overflow:hidden;background:var(--paper);">
-                  <div style="padding:12px 16px;background:var(--paper-elevated,#162032);border-bottom:1px solid var(--line);font-size:13px;font-weight:700;color:var(--ink);display:flex;align-items:center;gap:7px;">
+                  <div style="padding:12px 16px;background:var(--paper-elevated,#f8fafc);border-bottom:1px solid var(--line);font-size:13px;font-weight:700;color:var(--ink);display:flex;align-items:center;gap:7px;">
                     <i data-lucide="clipboard-list"></i>
                     <span>Ficha Cadastral Oficial</span>
                   </div>
@@ -538,7 +471,7 @@
                   <span id="console-latency">Latência: 8.5ms</span>
                   <span>Cloudflare Anycast</span>
                 </div>
-                <pre class="console-json" id="console-output" style="margin:0;font-family:'JetBrains Mono',monospace;font-size:11.5px;color:#162032;line-height:1.5;"></pre>
+                <pre class="console-json" id="console-output" style="margin:0;font-family:'JetBrains Mono',monospace;font-size:11.5px;color:#f8fafc;line-height:1.5;"></pre>
               </div>
             </div>
           </div>
@@ -547,33 +480,53 @@
     </main>
   </div>
 
-  <!-- Barra de Navegação Inferior Mobile (Bottom Navigation) -->
-  <nav class="mobile-bottom-nav" id="mobile-bottom-nav" aria-label="Navegação mobile">
-    <button class="mobile-nav-item is-active" data-view="consulta">
-      <i data-lucide="building-2"></i>
-      <span>Consulta</span>
-    </button>
-    <button class="mobile-nav-item" data-view="validador">
-      <i data-lucide="shield-check"></i>
-      <span>Validador</span>
-    </button>
-    <button class="mobile-nav-item" data-view="lote">
-      <i data-lucide="layers"></i>
-      <span>Lote</span>
-    </button>
-    <button class="mobile-nav-item" data-view="docs">
-      <i data-lucide="book-open"></i>
-      <span>Docs</span>
-    </button>
-    <a href="https://ponte-marketplace.maputo2.workers.dev/#catalogo" class="mobile-nav-item" style="text-decoration:none;">
-      <i data-lucide="layout-grid"></i>
-      <span>Marketplace</span>
-    </a>
-  </nav>
-
-
   <!-- Script da Aplicação e Integração -->
   <script type="module">
+
+    // Controle do Menu Lateral Mobile (Drawer)
+    function setupMobileNav() {
+      const drawerBtn = document.getElementById('mobile-hamburger-btn');
+      const drawerClose = document.getElementById('sidebar-drawer-close');
+      const drawerBackdrop = document.getElementById('sidebar-drawer-backdrop');
+      const sidebarEl = document.querySelector('.sidebar');
+
+      function openDrawer() {
+        if (sidebarEl) sidebarEl.classList.add('is-open');
+        if (drawerBackdrop) drawerBackdrop.hidden = false;
+      }
+      function closeDrawer() {
+        if (sidebarEl) sidebarEl.classList.remove('is-open');
+        if (drawerBackdrop) drawerBackdrop.hidden = true;
+      }
+
+      drawerBtn?.addEventListener('click', openDrawer);
+      drawerClose?.addEventListener('click', closeDrawer);
+      drawerBackdrop?.addEventListener('click', closeDrawer);
+
+      // Sincronização de Abas (Desktop, Sidebar e Mobile Bottom Nav)
+      const allTabBtns = document.querySelectorAll('.tab-nav-btn, .primary-nav .nav-link[data-view], .mobile-bottom-nav .mobile-nav-item[data-tab]');
+      allTabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const tabKey = btn.dataset.tab || btn.dataset.view;
+          if (!tabKey) return;
+          document.querySelectorAll('.tab-nav-btn').forEach(b => b.classList.toggle('is-active', b.dataset.tab === tabKey));
+          document.querySelectorAll('.primary-nav .nav-link[data-view]').forEach(b => b.classList.toggle('is-active', b.dataset.view === tabKey));
+          document.querySelectorAll('.mobile-bottom-nav .mobile-nav-item[data-tab]').forEach(b => b.classList.toggle('is-active', b.dataset.tab === tabKey));
+          document.querySelectorAll('.tab-pane').forEach(p => p.style.display = 'none');
+          const target = document.getElementById('section-' + tabKey);
+          if (target) target.style.display = 'block';
+          closeDrawer();
+          if (typeof updateSnippet === 'function') updateSnippet();
+          if (window.lucide) window.lucide.createIcons();
+        });
+      });
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', setupMobileNav);
+    } else {
+      setupMobileNav();
+    }
+
     // Tema Claro / Escuro
     const themeBtn = document.getElementById('theme-toggle-btn');
     if (themeBtn) {
@@ -582,7 +535,45 @@
         const next = cur === 'dark' ? 'light' : 'dark';
         document.documentElement.setAttribute('data-theme', next);
         localStorage.setItem('ponte.theme', next);
-        renderLucide();
+        
+    // Controle do Menu Lateral Mobile (Drawer)
+    const drawerBtn = document.getElementById('mobile-hamburger-btn');
+    const drawerClose = document.getElementById('sidebar-drawer-close');
+    const drawerBackdrop = document.getElementById('sidebar-drawer-backdrop');
+    const sidebarEl = document.querySelector('.sidebar');
+
+    function openDrawer() {
+      if (sidebarEl) sidebarEl.classList.add('is-open');
+      if (drawerBackdrop) drawerBackdrop.hidden = false;
+    }
+    function closeDrawer() {
+      if (sidebarEl) sidebarEl.classList.remove('is-open');
+      if (drawerBackdrop) drawerBackdrop.hidden = true;
+    }
+
+    drawerBtn?.addEventListener('click', openDrawer);
+    drawerClose?.addEventListener('click', closeDrawer);
+    drawerBackdrop?.addEventListener('click', closeDrawer);
+
+    // Sincronização de Abas (Desktop, Sidebar e Mobile Bottom Nav)
+    const allTabBtns = document.querySelectorAll('.tab-nav-btn, .primary-nav .nav-link[data-view], .mobile-bottom-nav .mobile-nav-item[data-tab]');
+    allTabBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tabKey = btn.dataset.tab || btn.dataset.view;
+        if (!tabKey) return;
+        document.querySelectorAll('.tab-nav-btn').forEach(b => b.classList.toggle('is-active', b.dataset.tab === tabKey));
+        document.querySelectorAll('.primary-nav .nav-link[data-view]').forEach(b => b.classList.toggle('is-active', b.dataset.view === tabKey));
+        document.querySelectorAll('.mobile-bottom-nav .mobile-nav-item[data-tab]').forEach(b => b.classList.toggle('is-active', b.dataset.tab === tabKey));
+        document.querySelectorAll('.tab-pane').forEach(p => p.style.display = 'none');
+        const target = document.getElementById('section-' + tabKey);
+        if (target) target.style.display = 'block';
+        closeDrawer();
+        if (typeof updateSnippet === 'function') updateSnippet();
+        if (window.lucide) window.lucide.createIcons();
+      });
+    });
+
+    renderLucide();
       });
     }
 
@@ -597,7 +588,6 @@
         const tabKey = btn.dataset.tab || btn.dataset.view;
         if (!tabKey) return;
         document.querySelectorAll('.tab-nav-btn').forEach(b => b.classList.toggle('is-active', b.dataset.tab === tabKey));
-        document.querySelectorAll('.mobile-bottom-nav .mobile-nav-item').forEach(b => b.classList.toggle('is-active', b.dataset.view === tabKey));
         document.querySelectorAll('.primary-nav .nav-link[data-view]').forEach(b => b.classList.toggle('is-active', b.dataset.view === tabKey));
         document.querySelectorAll('.tab-pane').forEach(p => p.style.display = 'none');
         const target = document.getElementById('section-' + tabKey);
@@ -717,7 +707,7 @@ print_r(json_decode($res, true));`;
           const sociosBox = document.getElementById('socios-list-container');
           if (qsaList.length > 0) {
             sociosBox.innerHTML = qsaList.map(s => `
-              <div style="padding:12px 16px;border-radius:var(--radius-md);background:var(--paper-elevated,#162032);border:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;">
+              <div style="padding:12px 16px;border-radius:var(--radius-md);background:var(--paper-elevated,#f8fafc);border:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;">
                 <div>
                   <div style="font-weight:800;color:var(--ink);">${s.nome_socio || s.nome || 'Sócio'}</div>
                   <div style="font-size:11.5px;color:var(--muted);">${s.qualificacao_socio || s.qualificacao || 'Administrador'} · ${s.faixa_etaria || 'Pessoa Física'}</div>
@@ -732,7 +722,7 @@ print_r(json_decode($res, true));`;
           // Preenche Contato
           const contatoBox = document.getElementById('contato-container');
           contatoBox.innerHTML = `
-            <div style="padding:14px;border-radius:var(--radius-md);background:var(--paper-elevated,#162032);border:1px solid var(--line);font-size:13px;">
+            <div style="padding:14px;border-radius:var(--radius-md);background:var(--paper-elevated,#f8fafc);border:1px solid var(--line);font-size:13px;">
               <strong>Telefone:</strong> ${data.telefone || data.ddd_telefone_1 || '(11) Não divulgado')}<br>
               <strong>E-mail:</strong> ${data.email || 'Não informado'}<br>
               <strong>Logradouro:</strong> ${data.logradouro || ''}, ${data.numero || ''} ${data.complemento || ''}<br>
@@ -765,27 +755,26 @@ print_r(json_decode($res, true));`;
       renderLucide();
       executarConsulta();
     }, 100);
-  
-    // Controle da Gaveta Lateral Móvel (Sidebar Drawer)
-    const hamBtn = document.getElementById('mobile-hamburger-btn');
-    const closeBtn = document.getElementById('sidebar-drawer-close');
-    const drawerBackdrop = document.getElementById('sidebar-drawer-backdrop');
-    const sidebar = document.querySelector('.sidebar');
-
-    function toggleDrawer(open) {
-      if (!sidebar || !drawerBackdrop) return;
-      sidebar.classList.toggle('is-open', open);
-      drawerBackdrop.hidden = !open;
-      if (open && window.lucide) window.lucide.createIcons();
-    }
-
-    if (hamBtn) hamBtn.addEventListener('click', () => toggleDrawer(true));
-    if (closeBtn) closeBtn.addEventListener('click', () => toggleDrawer(false));
-    if (drawerBackdrop) drawerBackdrop.addEventListener('click', () => toggleDrawer(false));
-    document.querySelectorAll('.sidebar .nav-link').forEach(link => {
-      link.addEventListener('click', () => toggleDrawer(false));
-    });
-  
   </script>
+
+    <!-- Barra de Navegação Inferior Mobile Oficial -->
+    <nav class="mobile-bottom-nav" id="mobile-bottom-nav" aria-label="Navegação mobile">
+      <button class="mobile-nav-item is-active" data-tab="consulta">
+        <i data-lucide="building-2"></i><span>Consulta</span>
+      </button>
+      <button class="mobile-nav-item " data-tab="socios">
+        <i data-lucide="users"></i><span>Sócios</span>
+      </button>
+      <button class="mobile-nav-item " data-tab="contato">
+        <i data-lucide="phone"></i><span>Contato</span>
+      </button>
+      <button class="mobile-nav-item " data-tab="docs">
+        <i data-lucide="book-open"></i><span>Docs</span>
+      </button>
+      <a class="mobile-nav-item" href="https://ponte-marketplace.maputo2.workers.dev" target="_blank" rel="noopener">
+        <i data-lucide="layout-grid"></i><span>Market</span>
+      </a>
+    </nav>
+
 </body>
 </html>

@@ -370,7 +370,7 @@ export default {
         headers: {
           ...CORS_HEADERS,
           'Content-Type': 'text/css; charset=utf-8',
-          'Cache-Control': 'public, max-age=604800, s-maxage=2592000'
+          'Cache-Control': 'public, max-age=60, s-maxage=120'
         }
       });
     }

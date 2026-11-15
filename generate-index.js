@@ -10,7 +10,7 @@ const html = `<!DOCTYPE html>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Manrope:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=3.2.0" />
+  <link rel="stylesheet" href="styles.css?v=4.0.0" />
   <script>
     (function() {
       const savedTheme = localStorage.getItem('ponte.theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
@@ -189,9 +189,11 @@ const html = `<!DOCTYPE html>
   </style>
 </head>
 <body>
+  <div class="sidebar-drawer-backdrop" id="sidebar-drawer-backdrop" hidden></div>
   <div class="app-shell">
     <!-- Sidebar Oficial do Ecossistema Ponte / OZPro -->
     <aside class="sidebar" aria-label="Navegação principal">
+      <button class="sidebar-drawer-close" id="sidebar-drawer-close" aria-label="Fechar menu lateral"><i data-lucide="x"></i></button>
       <a class="brand" href="#consulta" aria-label="Ponte API, CNPJ Pro">
         <img src="brand/ozpro-mark.svg" alt="Ponte API Logo" style="width:38px;height:38px;border-radius:10px;object-fit:contain;background:var(--mint);padding:4px;box-shadow:0 4px 12px rgba(163,230,53,0.35);" />
         <span><strong>ponte</strong><small>CNPJ PRO · OZPRO</small></span>
@@ -244,6 +246,7 @@ const html = `<!DOCTYPE html>
     <main class="main-area">
       <!-- Topbar Oficial -->
       <header class="topbar">
+        <button class="mobile-hamburger-btn" id="mobile-hamburger-btn" aria-label="Abrir menu lateral"><i data-lucide="menu"></i></button>
         <div class="breadcrumb">
           <span>Workspace</span>
           <i data-lucide="chevron-right"></i>
@@ -483,6 +486,51 @@ const html = `<!DOCTYPE html>
 
   <!-- Script da Aplicação e Integração -->
   <script type="module">
+
+    // Controle do Menu Lateral Mobile (Drawer)
+    function setupMobileNav() {
+      const drawerBtn = document.getElementById('mobile-hamburger-btn');
+      const drawerClose = document.getElementById('sidebar-drawer-close');
+      const drawerBackdrop = document.getElementById('sidebar-drawer-backdrop');
+      const sidebarEl = document.querySelector('.sidebar');
+
+      function openDrawer() {
+        if (sidebarEl) sidebarEl.classList.add('is-open');
+        if (drawerBackdrop) drawerBackdrop.hidden = false;
+      }
+      function closeDrawer() {
+        if (sidebarEl) sidebarEl.classList.remove('is-open');
+        if (drawerBackdrop) drawerBackdrop.hidden = true;
+      }
+
+      drawerBtn?.addEventListener('click', openDrawer);
+      drawerClose?.addEventListener('click', closeDrawer);
+      drawerBackdrop?.addEventListener('click', closeDrawer);
+
+      // Sincronização de Abas (Desktop, Sidebar e Mobile Bottom Nav)
+      const allTabBtns = document.querySelectorAll('.tab-nav-btn, .primary-nav .nav-link[data-view], .mobile-bottom-nav .mobile-nav-item[data-tab]');
+      allTabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const tabKey = btn.dataset.tab || btn.dataset.view;
+          if (!tabKey) return;
+          document.querySelectorAll('.tab-nav-btn').forEach(b => b.classList.toggle('is-active', b.dataset.tab === tabKey));
+          document.querySelectorAll('.primary-nav .nav-link[data-view]').forEach(b => b.classList.toggle('is-active', b.dataset.view === tabKey));
+          document.querySelectorAll('.mobile-bottom-nav .mobile-nav-item[data-tab]').forEach(b => b.classList.toggle('is-active', b.dataset.tab === tabKey));
+          document.querySelectorAll('.tab-pane').forEach(p => p.style.display = 'none');
+          const target = document.getElementById('section-' + tabKey);
+          if (target) target.style.display = 'block';
+          closeDrawer();
+          if (typeof updateSnippet === 'function') updateSnippet();
+          if (window.lucide) window.lucide.createIcons();
+        });
+      });
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', setupMobileNav);
+    } else {
+      setupMobileNav();
+    }
+
     // Tema Claro / Escuro
     const themeBtn = document.getElementById('theme-toggle-btn');
     if (themeBtn) {
@@ -491,7 +539,45 @@ const html = `<!DOCTYPE html>
         const next = cur === 'dark' ? 'light' : 'dark';
         document.documentElement.setAttribute('data-theme', next);
         localStorage.setItem('ponte.theme', next);
-        renderLucide();
+        
+    // Controle do Menu Lateral Mobile (Drawer)
+    const drawerBtn = document.getElementById('mobile-hamburger-btn');
+    const drawerClose = document.getElementById('sidebar-drawer-close');
+    const drawerBackdrop = document.getElementById('sidebar-drawer-backdrop');
+    const sidebarEl = document.querySelector('.sidebar');
+
+    function openDrawer() {
+      if (sidebarEl) sidebarEl.classList.add('is-open');
+      if (drawerBackdrop) drawerBackdrop.hidden = false;
+    }
+    function closeDrawer() {
+      if (sidebarEl) sidebarEl.classList.remove('is-open');
+      if (drawerBackdrop) drawerBackdrop.hidden = true;
+    }
+
+    drawerBtn?.addEventListener('click', openDrawer);
+    drawerClose?.addEventListener('click', closeDrawer);
+    drawerBackdrop?.addEventListener('click', closeDrawer);
+
+    // Sincronização de Abas (Desktop, Sidebar e Mobile Bottom Nav)
+    const allTabBtns = document.querySelectorAll('.tab-nav-btn, .primary-nav .nav-link[data-view], .mobile-bottom-nav .mobile-nav-item[data-tab]');
+    allTabBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tabKey = btn.dataset.tab || btn.dataset.view;
+        if (!tabKey) return;
+        document.querySelectorAll('.tab-nav-btn').forEach(b => b.classList.toggle('is-active', b.dataset.tab === tabKey));
+        document.querySelectorAll('.primary-nav .nav-link[data-view]').forEach(b => b.classList.toggle('is-active', b.dataset.view === tabKey));
+        document.querySelectorAll('.mobile-bottom-nav .mobile-nav-item[data-tab]').forEach(b => b.classList.toggle('is-active', b.dataset.tab === tabKey));
+        document.querySelectorAll('.tab-pane').forEach(p => p.style.display = 'none');
+        const target = document.getElementById('section-' + tabKey);
+        if (target) target.style.display = 'block';
+        closeDrawer();
+        if (typeof updateSnippet === 'function') updateSnippet();
+        if (window.lucide) window.lucide.createIcons();
+      });
+    });
+
+    renderLucide();
       });
     }
 
@@ -662,6 +748,26 @@ const html = `<!DOCTYPE html>
       executarConsulta();
     }, 100);
   </script>
+
+    <!-- Barra de Navegação Inferior Mobile Oficial -->
+    <nav class="mobile-bottom-nav" id="mobile-bottom-nav" aria-label="Navegação mobile">
+      <button class="mobile-nav-item is-active" data-tab="consulta">
+        <i data-lucide="building-2"></i><span>Consulta</span>
+      </button>
+      <button class="mobile-nav-item " data-tab="socios">
+        <i data-lucide="users"></i><span>Sócios</span>
+      </button>
+      <button class="mobile-nav-item " data-tab="contato">
+        <i data-lucide="phone"></i><span>Contato</span>
+      </button>
+      <button class="mobile-nav-item " data-tab="docs">
+        <i data-lucide="book-open"></i><span>Docs</span>
+      </button>
+      <a class="mobile-nav-item" href="https://ponte-marketplace.maputo2.workers.dev" target="_blank" rel="noopener">
+        <i data-lucide="layout-grid"></i><span>Market</span>
+      </a>
+    </nav>
+
 </body>
 </html>
 `;

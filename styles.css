@@ -3578,20 +3578,82 @@ h1 {
 @keyframes toast-in { from { opacity: 0; transform: translateY(10px) scale(0.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
 
 /* ==============================================================
-   BARRA DE NAVEGAÇÃO INFERIOR MOBILE (BOTTOM NAVIGATION BAR)
+   BARRA DE NAVEGAÇÃO INFERIOR MOBILE & MENU LATERAL (DRAWER)
    ============================================================== */
 .mobile-bottom-nav {
   display: none;
 }
+.mobile-hamburger-btn {
+  display: none;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  place-items: center;
+  cursor: pointer;
+  margin-right: 8px;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+}
+.mobile-hamburger-btn:hover {
+  background: var(--paper-elevated);
+}
+.sidebar-drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 98;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  transition: opacity 0.2s ease;
+}
+.sidebar-drawer-backdrop[hidden] {
+  display: none !important;
+}
+.sidebar-drawer-close {
+  display: none;
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #fff;
+  place-items: center;
+  cursor: pointer;
+}
 
-@media (max-width: 760px) {
+@media (max-width: 768px) {
   body {
-    padding-bottom: 74px; /* Espaço para não cobrir o conteúdo */
+    padding-bottom: 74px !important; /* Espaço para não cobrir o conteúdo */
   }
 
-  /* Oculta sidebar tradicional no mobile em favor da bottom bar */
+  /* Sidebar transforma-se em gaveta móvel (Drawer) */
   .sidebar {
-    display: none !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    bottom: 0 !important;
+    width: 285px !important;
+    max-width: 85vw !important;
+    z-index: 100 !important;
+    transform: translateX(-100%);
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    display: flex !important;
+    box-shadow: var(--shadow-xl) !important;
+  }
+  .sidebar.is-open {
+    transform: translateX(0) !important;
+  }
+  .mobile-hamburger-btn {
+    display: grid !important;
+  }
+  .sidebar-drawer-close {
+    display: grid !important;
   }
 
   .mobile-bottom-nav {
@@ -3601,8 +3663,8 @@ h1 {
     left: 0;
     right: 0;
     height: 64px;
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    display: flex;
+    justify-content: space-around;
     align-items: center;
     background: rgba(255, 255, 255, 0.94);
     backdrop-filter: blur(20px) saturate(180%);
@@ -3626,12 +3688,14 @@ h1 {
     justify-content: center;
     gap: 4px;
     height: 100%;
+    flex: 1;
     padding: 6px 2px;
     background: transparent;
     border: 0;
     color: var(--muted);
     font-size: 10px;
     font-weight: 600;
+    text-decoration: none;
     cursor: pointer;
     transition: all 0.15s ease;
   }
@@ -3854,13 +3918,32 @@ h1 {
   }
 }
 
-/* ?? Otimiza??es para Telas Estreitas (<1024px) ?? */
+/* ── Otimizações para Telas Estreitas (<1024px) ── */
 @media (max-width: 1024px) {
   .app-shell {
     grid-template-columns: 1fr !important;
   }
   .sidebar {
-    display: none !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    bottom: 0 !important;
+    width: 285px !important;
+    max-width: 85vw !important;
+    z-index: 100 !important;
+    transform: translateX(-100%);
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    display: flex !important;
+    box-shadow: var(--shadow-xl) !important;
+  }
+  .sidebar.is-open {
+    transform: translateX(0) !important;
+  }
+  .mobile-hamburger-btn {
+    display: grid !important;
+  }
+  .sidebar-drawer-close {
+    display: grid !important;
   }
   .topbar {
     padding: 0 14px !important;
