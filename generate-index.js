@@ -539,45 +539,7 @@ const html = `<!DOCTYPE html>
         const next = cur === 'dark' ? 'light' : 'dark';
         document.documentElement.setAttribute('data-theme', next);
         localStorage.setItem('ponte.theme', next);
-        
-    // Controle do Menu Lateral Mobile (Drawer)
-    const drawerBtn = document.getElementById('mobile-hamburger-btn');
-    const drawerClose = document.getElementById('sidebar-drawer-close');
-    const drawerBackdrop = document.getElementById('sidebar-drawer-backdrop');
-    const sidebarEl = document.querySelector('.sidebar');
-
-    function openDrawer() {
-      if (sidebarEl) sidebarEl.classList.add('is-open');
-      if (drawerBackdrop) drawerBackdrop.hidden = false;
-    }
-    function closeDrawer() {
-      if (sidebarEl) sidebarEl.classList.remove('is-open');
-      if (drawerBackdrop) drawerBackdrop.hidden = true;
-    }
-
-    drawerBtn?.addEventListener('click', openDrawer);
-    drawerClose?.addEventListener('click', closeDrawer);
-    drawerBackdrop?.addEventListener('click', closeDrawer);
-
-    // Sincronização de Abas (Desktop, Sidebar e Mobile Bottom Nav)
-    const allTabBtns = document.querySelectorAll('.tab-nav-btn, .primary-nav .nav-link[data-view], .mobile-bottom-nav .mobile-nav-item[data-tab]');
-    allTabBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
-        const tabKey = btn.dataset.tab || btn.dataset.view;
-        if (!tabKey) return;
-        document.querySelectorAll('.tab-nav-btn').forEach(b => b.classList.toggle('is-active', b.dataset.tab === tabKey));
-        document.querySelectorAll('.primary-nav .nav-link[data-view]').forEach(b => b.classList.toggle('is-active', b.dataset.view === tabKey));
-        document.querySelectorAll('.mobile-bottom-nav .mobile-nav-item[data-tab]').forEach(b => b.classList.toggle('is-active', b.dataset.tab === tabKey));
-        document.querySelectorAll('.tab-pane').forEach(p => p.style.display = 'none');
-        const target = document.getElementById('section-' + tabKey);
-        if (target) target.style.display = 'block';
-        closeDrawer();
-        if (typeof updateSnippet === 'function') updateSnippet();
-        if (window.lucide) window.lucide.createIcons();
-      });
-    });
-
-    renderLucide();
+        renderLucide();
       });
     }
 
