@@ -9,6 +9,7 @@
   --line-hover: #cbd6ce;
   --canvas: #f8faf8;
   --paper: #ffffff;
+  --paper-elevated: #f1f5f2;
   --forest-950: #0a1312;
   --forest-900: #0e1c19;
   --forest-850: #142421;
@@ -54,6 +55,7 @@
   --line-hover: #334155;
   --canvas: #0b0f19;
   --paper: #111827;
+  --paper-elevated: #162032;
   --forest-950: #060911;
   --forest-900: #0b0f19;
   --forest-850: #0f172a;
