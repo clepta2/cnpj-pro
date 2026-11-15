@@ -1,12 +1,12 @@
-import fs from 'fs';
+﻿import fs from 'fs';
 
 const html = `<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CNPJ Pro • Consulta Cadastral Anycast & Score de Legitimidade • Ponte API Market</title>
-  <meta name="description" content="Consulta em tempo real de CNPJs, quadro societário (QSA), validação de dígitos e score de legitimidade na Cloudflare Edge Anycast." />
+  <title>CNPJ Pro â€¢ Consulta Cadastral Anycast & Score de Legitimidade â€¢ Ponte API Market</title>
+  <meta name="description" content="Consulta em tempo real de CNPJs, quadro societÃ¡rio (QSA), validaÃ§Ã£o de dÃ­gitos e score de legitimidade na Cloudflare Edge Anycast." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Manrope:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -37,11 +37,22 @@ const html = `<!DOCTYPE html>
     .playground-split {
       display: grid;
       grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
-      gap: 26px;
+      gap: 24px;
       margin-top: 24px;
+      width: 100%;
+      min-width: 0;
     }
     @media (max-width: 1100px) {
-      .playground-split { grid-template-columns: 1fr; }
+      .playground-split { grid-template-columns: 1fr !important; gap: 18px !important; }
+    }
+    .playground-left,
+    .playground-right,
+    .tab-pane,
+    .card-dashboard,
+    .terminal-window {
+      min-width: 0 !important;
+      max-width: 100% !important;
+      overflow: hidden;
     }
     .specs-table {
       width: 100%;
@@ -180,10 +191,10 @@ const html = `<!DOCTYPE html>
 <body>
   <div class="app-shell">
     <!-- Sidebar Oficial do Ecossistema Ponte / OZPro -->
-    <aside class="sidebar" aria-label="Navegação principal">
+    <aside class="sidebar" aria-label="NavegaÃ§Ã£o principal">
       <a class="brand" href="#consulta" aria-label="Ponte API, CNPJ Pro">
         <img src="brand/ozpro-mark.svg" alt="Ponte API Logo" style="width:38px;height:38px;border-radius:10px;object-fit:contain;background:var(--mint);padding:4px;box-shadow:0 4px 12px rgba(163,230,53,0.35);" />
-        <span><strong>ponte</strong><small>CNPJ PRO · OZPRO</small></span>
+        <span><strong>ponte</strong><small>CNPJ PRO Â· OZPRO</small></span>
       </a>
 
       <nav class="primary-nav" id="primary-nav">
@@ -192,13 +203,13 @@ const html = `<!DOCTYPE html>
           <i data-lucide="building-2"></i> <span>Consulta Cadastral</span>
         </button>
         <button class="nav-link" data-view="socios">
-          <i data-lucide="users"></i> <span>Quadro Societário (QSA)</span>
+          <i data-lucide="users"></i> <span>Quadro SocietÃ¡rio (QSA)</span>
         </button>
         <button class="nav-link" data-view="contato">
           <i data-lucide="phone"></i> <span>Contato & B2B Lead</span>
         </button>
         <button class="nav-link" data-view="docs">
-          <i data-lucide="book-open"></i> <span>Documentação REST</span>
+          <i data-lucide="book-open"></i> <span>DocumentaÃ§Ã£o REST</span>
         </button>
 
         <div class="nav-section-label">ECOSSISTEMA PONTE</div>
@@ -216,7 +227,7 @@ const html = `<!DOCTYPE html>
       <div class="sidebar-bottom">
         <div class="status-row">
           <span class="status-dot connected"></span>
-          <span>Cloudflare Edge · &lt;10ms</span>
+          <span>Cloudflare Edge Â· &lt;10ms</span>
         </div>
         <div class="profile-row">
           <div class="avatar lg">CP</div>
@@ -225,11 +236,11 @@ const html = `<!DOCTYPE html>
             <span>Receita Federal Mirror</span>
           </div>
         </div>
-        <div class="sidebar-version">v2.0.0 · 20M+ Empresas · QSA</div>
+        <div class="sidebar-version">v2.0.0 Â· 20M+ Empresas Â· QSA</div>
       </div>
     </aside>
 
-    <!-- Área Principal -->
+    <!-- Ãrea Principal -->
     <main class="main-area">
       <!-- Topbar Oficial -->
       <header class="topbar">
@@ -249,39 +260,39 @@ const html = `<!DOCTYPE html>
             <i data-lucide="moon"></i>
           </button>
           <a href="https://ponte-marketplace.maputo2.workers.dev" target="_blank" rel="noopener" class="primary-button accent" style="text-decoration:none;display:inline-flex;align-items:center;gap:7px;font-size:12.5px;padding:0 16px;height:36px;">
-            <i data-lucide="sparkles"></i> <span>Catálogo Completo</span>
+            <i data-lucide="sparkles"></i> <span>CatÃ¡logo Completo</span>
           </a>
         </div>
       </header>
 
-      <!-- Conteúdo da Página -->
+      <!-- ConteÃºdo da PÃ¡gina -->
       <div class="content-wrap">
         <div class="page-heading">
           <div>
             <p class="eyebrow">DADOS CADASTRAIS & SCORE DE LEGITIMIDADE B2B</p>
-            <h1>CNPJ Pro • Console Oficial Anycast</h1>
+            <h1>CNPJ Pro â€¢ Console Oficial Anycast</h1>
             <p class="page-subtitle">
-              Consulta cadastral e societária de CNPJs em tempo real com 5 tipos de retorno (Resumo 10ms, Completa, Contato B2B, Quadro Societário QSA, Validador Módulo 11) cobrindo mais de 20 milhões de empresas brasileiras na borda Anycast.
+              Consulta cadastral e societÃ¡ria de CNPJs em tempo real com 5 tipos de retorno (Resumo 10ms, Completa, Contato B2B, Quadro SocietÃ¡rio QSA, Validador MÃ³dulo 11) cobrindo mais de 20 milhÃµes de empresas brasileiras na borda Anycast.
             </p>
           </div>
         </div>
 
-        <!-- Cards de Métricas -->
+        <!-- Cards de MÃ©tricas -->
         <div class="billing-models-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); margin-bottom: 26px;">
           <div class="model-card credit-card" style="padding:18px 22px;">
             <div class="model-card-header" style="margin-bottom:10px;">
               <span class="model-badge credit"><i data-lucide="database"></i> 20M+ EMPRESAS</span>
             </div>
             <div style="font-size:20px;font-weight:800;color:var(--ink);margin-bottom:4px;">Receita Federal Mirror</div>
-            <p style="font-size:12.5px;color:var(--muted);margin:0;line-height:1.45;">Dados sincronizados de matrizes, filiais, MEIs e grandes corporações nacionais.</p>
+            <p style="font-size:12.5px;color:var(--muted);margin:0;line-height:1.45;">Dados sincronizados de matrizes, filiais, MEIs e grandes corporaÃ§Ãµes nacionais.</p>
           </div>
 
           <div class="model-card subscription-card" style="padding:18px 22px;">
             <div class="model-card-header" style="margin-bottom:10px;">
-              <span class="model-badge sub"><i data-lucide="users"></i> QSA & SÓCIOS</span>
+              <span class="model-badge sub"><i data-lucide="users"></i> QSA & SÃ“CIOS</span>
             </div>
-            <div style="font-size:20px;font-weight:800;color:var(--ink);margin-bottom:4px;">Quadro Societário</div>
-            <p style="font-size:12.5px;color:var(--muted);margin:0;line-height:1.45;">Identificação dos sócios administradores, capital social e qualificações legais.</p>
+            <div style="font-size:20px;font-weight:800;color:var(--ink);margin-bottom:4px;">Quadro SocietÃ¡rio</div>
+            <p style="font-size:12.5px;color:var(--muted);margin:0;line-height:1.45;">IdentificaÃ§Ã£o dos sÃ³cios administradores, capital social e qualificaÃ§Ãµes legais.</p>
           </div>
 
           <div class="model-card tier-card" style="padding:18px 22px;">
@@ -289,17 +300,17 @@ const html = `<!DOCTYPE html>
               <span class="model-badge tier"><i data-lucide="zap"></i> SUB-10MS ANYCAST</span>
             </div>
             <div style="font-size:20px;font-weight:800;color:var(--ink);margin-bottom:4px;">Cache de Alta Velocidade</div>
-            <p style="font-size:12.5px;color:var(--muted);margin:0;line-height:1.45;">Respostas ultra-rápidas na memória RAM da Cloudflare para formulários B2B em checkout.</p>
+            <p style="font-size:12.5px;color:var(--muted);margin:0;line-height:1.45;">Respostas ultra-rÃ¡pidas na memÃ³ria RAM da Cloudflare para formulÃ¡rios B2B em checkout.</p>
           </div>
         </div>
 
-        <!-- Abas de Navegação -->
+        <!-- Abas de NavegaÃ§Ã£o -->
         <div class="tab-nav-bar">
           <button class="tab-nav-btn is-active" data-tab="consulta">
             <i data-lucide="building-2"></i> <span>Consulta Cadastral (Resumo / Completa)</span>
           </button>
           <button class="tab-nav-btn" data-tab="socios">
-            <i data-lucide="users"></i> <span>Quadro Societário (QSA)</span>
+            <i data-lucide="users"></i> <span>Quadro SocietÃ¡rio (QSA)</span>
           </button>
           <button class="tab-nav-btn" data-tab="contato">
             <i data-lucide="phone"></i> <span>Contato B2B & Leads</span>
@@ -308,7 +319,7 @@ const html = `<!DOCTYPE html>
 
         <!-- Playground Split-Screen de 2 Colunas -->
         <div class="playground-split">
-          <!-- Coluna 1: Formulário e Painel Visual -->
+          <!-- Coluna 1: FormulÃ¡rio e Painel Visual -->
           <div class="playground-left">
             <div id="section-consulta" class="tab-pane">
               <div class="card-dashboard">
@@ -320,18 +331,18 @@ const html = `<!DOCTYPE html>
                   <span class="status-badge-pill green">Ativo & Online</span>
                 </div>
                 <p style="font-size:12.5px;color:var(--muted);margin-bottom:16px;line-height:1.5;">
-                  Digite o CNPJ para puxar Razão Social, Nome Fantasia, CNAE, Situação Cadastral e Localização:
+                  Digite o CNPJ para puxar RazÃ£o Social, Nome Fantasia, CNAE, SituaÃ§Ã£o Cadastral e LocalizaÃ§Ã£o:
                 </p>
 
-                <!-- Input e Botão de Consulta -->
+                <!-- Input e BotÃ£o de Consulta -->
                 <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;">
-                  <input type="text" id="cnpj-input" value="00.000.000/0001-91" placeholder="00.000.000/0001-91..." maxlength="18" style="flex:2;min-width:220px;height:44px;padding:0 14px;border:1px solid var(--line);border-radius:var(--radius-md);font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;color:var(--ink);background:var(--paper);outline:none;" />
+                  <input type="text" id="cnpj-input" value="00.000.000/0001-91" placeholder="00.000.000/0001-91..." maxlength="18" style="flex:2;min-width:140px;height:44px;padding:0 14px;border:1px solid var(--line);border-radius:var(--radius-md);font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;color:var(--ink);background:var(--paper);outline:none;" />
                   <button id="btn-exec-cnpj" class="primary-button accent" style="height:44px;padding:0 18px;font-size:13px;font-weight:700;display:inline-flex;align-items:center;gap:7px;">
                     <i data-lucide="play"></i> <span>Consultar</span>
                   </button>
                 </div>
 
-                <!-- Presets Rápidos Padronizados -->
+                <!-- Presets RÃ¡pidos Padronizados -->
                 <div style="display:flex;gap:7px;flex-wrap:wrap;align-items:center;font-size:11.5px;margin-bottom:20px;">
                   <span style="color:var(--muted);font-weight:600;">Empresas de exemplo:</span>
                   <button class="secondary-button sample-cnpj" data-cnpj="00000000000191" style="padding:4px 10px;font-size:11.5px;display:inline-flex;align-items:center;gap:5px;">
@@ -357,7 +368,7 @@ const html = `<!DOCTYPE html>
                   <table class="specs-table">
                     <tbody>
                       <tr>
-                        <td class="label-col">Razão Social</td>
+                        <td class="label-col">RazÃ£o Social</td>
                         <td class="val-col" id="val-razao">BANCO DO BRASIL SA</td>
                       </tr>
                       <tr>
@@ -365,20 +376,20 @@ const html = `<!DOCTYPE html>
                         <td class="val-col" id="val-fantasia">DIRECAO GERAL</td>
                       </tr>
                       <tr>
-                        <td class="label-col">Situação Cadastral</td>
+                        <td class="label-col">SituaÃ§Ã£o Cadastral</td>
                         <td class="val-col" id="val-situacao"><span class="status-badge-pill green">ATIVA</span></td>
                       </tr>
                       <tr>
                         <td class="label-col">CNAE Principal</td>
-                        <td class="val-col" id="val-cnae">64.22-1-00 (Bancos múltiplos)</td>
+                        <td class="val-col" id="val-cnae">64.22-1-00 (Bancos mÃºltiplos)</td>
                       </tr>
                       <tr>
-                        <td class="label-col">Localização (UF / Cidade)</td>
-                        <td class="val-col" id="val-endereco">Brasília / DF</td>
+                        <td class="label-col">LocalizaÃ§Ã£o (UF / Cidade)</td>
+                        <td class="val-col" id="val-endereco">BrasÃ­lia / DF</td>
                       </tr>
                       <tr>
                         <td class="label-col">Score de Legitimidade</td>
-                        <td class="val-col" id="val-score"><span class="status-badge-pill green">980 / 1000 (Altíssima)</span></td>
+                        <td class="val-col" id="val-score"><span class="status-badge-pill green">980 / 1000 (AltÃ­ssima)</span></td>
                       </tr>
                     </tbody>
                   </table>
@@ -386,18 +397,18 @@ const html = `<!DOCTYPE html>
               </div>
             </div>
 
-            <!-- TAB 2: SÓCIOS QSA -->
+            <!-- TAB 2: SÃ“CIOS QSA -->
             <div id="section-socios" class="tab-pane" style="display:none;">
               <div class="card-dashboard">
                 <div style="font-size:14px;font-weight:700;color:var(--ink);margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;">
                   <span style="display:flex;align-items:center;gap:8px;">
                     <i data-lucide="users" style="color:var(--blue);"></i>
-                    <span>Quadro de Sócios e Administradores (QSA)</span>
+                    <span>Quadro de SÃ³cios e Administradores (QSA)</span>
                   </span>
                   <span class="status-badge-pill blue">Receita Federal</span>
                 </div>
                 <p style="font-size:12.5px;color:var(--muted);margin-bottom:16px;line-height:1.5;">
-                  Lista completa dos sócios, diretores e representantes legais registrados na base oficial:
+                  Lista completa dos sÃ³cios, diretores e representantes legais registrados na base oficial:
                 </p>
                 <div id="socios-list-container" style="display:grid;gap:10px;"></div>
               </div>
@@ -409,7 +420,7 @@ const html = `<!DOCTYPE html>
                 <div style="font-size:14px;font-weight:700;color:var(--ink);margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;">
                   <span style="display:flex;align-items:center;gap:8px;">
                     <i data-lucide="phone" style="color:var(--blue);"></i>
-                    <span>Contato Corporativo B2B & Localização</span>
+                    <span>Contato Corporativo B2B & LocalizaÃ§Ã£o</span>
                   </span>
                   <span class="status-badge-pill blue">Enriquecimento Lead</span>
                 </div>
@@ -438,14 +449,14 @@ const html = `<!DOCTYPE html>
                 </button>
               </div>
 
-              <!-- Caixa de Código do Snippet -->
+              <!-- Caixa de CÃ³digo do Snippet -->
               <div class="snippet-code-box" style="padding:14px 18px;background:rgba(0,0,0,0.30);border-bottom:1px solid rgba(255,255,255,0.06);">
                 <pre class="snippet-pre" style="margin:0;font-family:'JetBrains Mono',monospace;font-size:12px;color:#7dd3fc;line-height:1.5;overflow-x:auto;"><code id="snippet-code">curl -s "https://cnpj-pro-api.maputo3.workers.dev/api/cnpj/00000000000191/resumo" \
   -H "Authorization: ******" \
   -H "x-api-key: cnpj_live_pro_2026"</code></pre>
               </div>
 
-              <!-- Barra de Execução Sandbox -->
+              <!-- Barra de ExecuÃ§Ã£o Sandbox -->
               <div class="playground-bar">
                 <span class="method-tag get">GET</span>
                 <code class="endpoint-code" id="endpoint-display" style="font-size:12px;">/api/cnpj/00000000000191/resumo</code>
@@ -458,7 +469,7 @@ const html = `<!DOCTYPE html>
               <div class="playground-console" style="min-height:300px;max-height:540px;overflow-y:auto;padding:16px;">
                 <div class="console-response-header" id="console-header" style="font-size:11.5px;margin-bottom:10px;">
                   <span class="badge-200" id="console-status">200 OK</span>
-                  <span id="console-latency">Latência: 8.5ms</span>
+                  <span id="console-latency">LatÃªncia: 8.5ms</span>
                   <span>Cloudflare Anycast</span>
                 </div>
                 <pre class="console-json" id="console-output" style="margin:0;font-family:'JetBrains Mono',monospace;font-size:11.5px;color:#f8fafc;line-height:1.5;"></pre>
@@ -470,7 +481,7 @@ const html = `<!DOCTYPE html>
     </main>
   </div>
 
-  <!-- Script da Aplicação e Integração -->
+  <!-- Script da AplicaÃ§Ã£o e IntegraÃ§Ã£o -->
   <script type="module">
     // Tema Claro / Escuro
     const themeBtn = document.getElementById('theme-toggle-btn');
@@ -488,7 +499,7 @@ const html = `<!DOCTYPE html>
       if (window.lucide) window.lucide.createIcons();
     }
 
-    // Navegação de Abas
+    // NavegaÃ§Ã£o de Abas
     const tabBtns = document.querySelectorAll('.tab-nav-btn, .primary-nav .nav-link[data-view]');
     tabBtns.forEach(btn => {
       btn.addEventListener('click', () => {
@@ -503,9 +514,9 @@ const html = `<!DOCTYPE html>
         const bread = document.getElementById('breadcrumb-title');
         const titles = {
           consulta: 'Consulta Cadastral',
-          socios: 'Quadro Societário (QSA)',
+          socios: 'Quadro SocietÃ¡rio (QSA)',
           contato: 'Contato & B2B Lead',
-          docs: 'Documentação REST'
+          docs: 'DocumentaÃ§Ã£o REST'
         };
         if (bread && titles[tabKey]) bread.textContent = titles[tabKey];
         updateSnippet();
@@ -559,7 +570,7 @@ const html = `<!DOCTYPE html>
       navigator.clipboard.writeText(txt).then(() => alert('Snippet copiado com sucesso!'));
     });
 
-    // ── LÓGICA DE CONSULTA DE CNPJ ──
+    // â”€â”€ LÃ“GICA DE CONSULTA DE CNPJ â”€â”€
     async function executarConsulta() {
       const raw = document.getElementById('cnpj-input').value;
       const clean = raw.replace(/\\D/g, '');
@@ -578,12 +589,12 @@ const html = `<!DOCTYPE html>
 
         consoleStatus.textContent = res.ok ? '200 OK' : '400 ERRO';
         consoleStatus.className = res.ok ? 'badge-200' : 'badge-500';
-        consoleLat.textContent = \`Latência: \${lat}ms\`;
+        consoleLat.textContent = \`LatÃªncia: \${lat}ms\`;
         consoleOutput.textContent = JSON.stringify(data, null, 2);
 
         if (data.ok || data.razaoSocial || data.razao_social) {
           const razao = data.razaoSocial || data.razao_social || 'N/A';
-          const fantasia = data.nomeFantasia || data.nome_fantasia || 'Não informado';
+          const fantasia = data.nomeFantasia || data.nome_fantasia || 'NÃ£o informado';
           const sit = data.situacaoCadastral || data.situacao || 'ATIVA';
           const cnaeDesc = data.cnaePrincipalDescricao || (data.cnae_fiscal_descricao ? \`\${data.cnae_fiscal} - \${data.cnae_fiscal_descricao}\` : 'N/A');
           const loc = \`\${data.municipio || data.cidade || ''} / \${data.uf || ''}\`;
@@ -595,33 +606,33 @@ const html = `<!DOCTYPE html>
             : \`<span class="status-badge-pill red">\${sit}</span>\`;
           document.getElementById('val-cnae').textContent = cnaeDesc;
           document.getElementById('val-endereco').textContent = loc;
-          document.getElementById('val-score').innerHTML = '<span class="status-badge-pill green">980 / 1000 (Altíssima)</span>';
+          document.getElementById('val-score').innerHTML = '<span class="status-badge-pill green">980 / 1000 (AltÃ­ssima)</span>';
 
-          // Preenche Sócios
+          // Preenche SÃ³cios
           const qsaList = data.qsa || data.socios || [];
           const sociosBox = document.getElementById('socios-list-container');
           if (qsaList.length > 0) {
             sociosBox.innerHTML = qsaList.map(s => \`
               <div style="padding:12px 16px;border-radius:var(--radius-md);background:var(--paper-elevated,#f8fafc);border:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;">
                 <div>
-                  <div style="font-weight:800;color:var(--ink);">\${s.nome_socio || s.nome || 'Sócio'}</div>
-                  <div style="font-size:11.5px;color:var(--muted);">\${s.qualificacao_socio || s.qualificacao || 'Administrador'} · \${s.faixa_etaria || 'Pessoa Física'}</div>
+                  <div style="font-weight:800;color:var(--ink);">\${s.nome_socio || s.nome || 'SÃ³cio'}</div>
+                  <div style="font-size:11.5px;color:var(--muted);">\${s.qualificacao_socio || s.qualificacao || 'Administrador'} Â· \${s.faixa_etaria || 'Pessoa FÃ­sica'}</div>
                 </div>
                 <span class="status-badge-pill blue">QSA Ativo</span>
               </div>
             \`).join('');
           } else {
-            sociosBox.innerHTML = '<div style="color:var(--muted);font-size:12px;">Nenhum sócio adicional informado ou empresa individual.</div>';
+            sociosBox.innerHTML = '<div style="color:var(--muted);font-size:12px;">Nenhum sÃ³cio adicional informado ou empresa individual.</div>';
           }
 
           // Preenche Contato
           const contatoBox = document.getElementById('contato-container');
           contatoBox.innerHTML = \`
             <div style="padding:14px;border-radius:var(--radius-md);background:var(--paper-elevated,#f8fafc);border:1px solid var(--line);font-size:13px;">
-              <strong>Telefone:</strong> \${data.telefone || data.ddd_telefone_1 || '(11) Não divulgado')}<br>
-              <strong>E-mail:</strong> \${data.email || 'Não informado'}<br>
+              <strong>Telefone:</strong> \${data.telefone || data.ddd_telefone_1 || '(11) NÃ£o divulgado')}<br>
+              <strong>E-mail:</strong> \${data.email || 'NÃ£o informado'}<br>
               <strong>Logradouro:</strong> \${data.logradouro || ''}, \${data.numero || ''} \${data.complemento || ''}<br>
-              <strong>Bairro:</strong> \${data.bairro || ''} — CEP: \${data.cep || ''}
+              <strong>Bairro:</strong> \${data.bairro || ''} â€” CEP: \${data.cep || ''}
             </div>
           \`;
         }
@@ -644,7 +655,7 @@ const html = `<!DOCTYPE html>
 
     document.getElementById('btn-run-sandbox').addEventListener('click', executarConsulta);
 
-    // Inicialização
+    // InicializaÃ§Ã£o
     renderLucide();
     setTimeout(() => {
       renderLucide();
@@ -657,3 +668,4 @@ const html = `<!DOCTYPE html>
 
 fs.writeFileSync('index.html', html, 'utf8');
 console.log('cnpj-pro index.html updated with marketplace design system!');
+
