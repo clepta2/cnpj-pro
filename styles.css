@@ -2599,6 +2599,26 @@ h1 {
   border-color: #059669;
   background: #f0fdf4;
 }
+[data-theme="dark"] .pay-method {
+  background: #0f172a;
+  border-color: #1e293b;
+}
+[data-theme="dark"] .pay-method.selected {
+  background: rgba(16, 185, 129, 0.12);
+  border-color: rgba(16, 185, 129, 0.35);
+}
+[data-theme="dark"] .recharge-option {
+  background: #0f172a;
+  border-color: #1e293b;
+}
+[data-theme="dark"] .recharge-option:hover {
+  background: #1e293b;
+}
+[data-theme="dark"] .recharge-option.active {
+  background: rgba(59, 130, 246, 0.15);
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25);
+}
 .pay-icon {
   display: grid;
   width: 32px;
@@ -3682,13 +3702,87 @@ h1 {
   .topbar {
     position: sticky;
     top: 0;
-    height: 58px;
-    padding: 0 16px;
+    height: 56px;
+    padding: 0 12px;
     border-bottom: 1px solid var(--line);
     z-index: 40;
+    width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+  }
+  .breadcrumb {
+    font-size: 13px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 45%;
+  }
+  .breadcrumb span, .breadcrumb svg {
+    display: none !important;
+  }
+  .breadcrumb strong {
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .environment {
+    display: none !important;
+  }
+  .role-toggle {
+    display: none !important;
+  }
+  .balance-badge {
+    display: none !important;
+  }
+  .notification-button {
+    display: none !important;
+  }
+  .topbar-actions {
+    gap: 6px !important;
+    flex-shrink: 0;
+  }
+  .recharge-btn {
+    padding: 0 10px !important;
+    min-height: 32px !important;
+    font-size: 11px !important;
+  }
+  .topbar-login-btn {
+    padding: 0 10px !important;
+    min-height: 32px !important;
+    font-size: 11px !important;
   }
   .content-wrap {
-    padding: 16px 14px 32px;
+    padding: 16px 12px 32px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  /* Modais e Painéis Mobile */
+  .modal {
+    width: calc(100vw - 20px) !important;
+    max-width: calc(100vw - 20px) !important;
+    padding: 18px 14px !important;
+    max-height: 92vh !important;
+    margin: 10px auto !important;
+  }
+  .recharge-amounts {
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+  }
+  .payment-methods-grid {
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+  }
+  .playground-split {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+  .plate-render-svg-wrap {
+    max-width: 100% !important;
+  }
+  .card-actions {
+    grid-template-columns: 1fr !important;
   }
 
   /* Cards e botões mais confortáveis para toque no celular */
@@ -3759,3 +3853,86 @@ h1 {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ?? Otimiza??es para Telas Estreitas (<1024px) ?? */
+@media (max-width: 1024px) {
+  .app-shell {
+    grid-template-columns: 1fr !important;
+  }
+  .sidebar {
+    display: none !important;
+  }
+  .topbar {
+    padding: 0 14px !important;
+    height: 52px !important;
+  }
+  .environment, .role-toggle, .balance-badge {
+    display: none !important;
+  }
+  .content-wrap {
+    padding: 16px 14px 60px !important;
+  }
+  .developer-hero {
+    grid-template-columns: 1fr !important;
+    padding: 18px 16px !important;
+    gap: 16px !important;
+  }
+  .hero-title {
+    font-size: 20px !important;
+  }
+  .hero-description {
+    font-size: 12px !important;
+  }
+  .hero-features {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+  }
+  .hero-feature-item {
+    padding: 8px 10px !important;
+  }
+  .hero-feature-item span {
+    font-size: 11px !important;
+  }
+  .api-grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+  .api-card {
+    padding: 14px 16px !important;
+  }
+
+  /* Compactação de Pílulas e Terminais para Telas Estreitas */
+  .category-chip {
+    min-height: 28px !important;
+    height: 28px !important;
+    padding: 0 10px !important;
+    font-size: 11px !important;
+  }
+  .action-btn {
+    min-height: 32px !important;
+    font-size: 11px !important;
+  }
+  .playground-console {
+    padding: 12px !important;
+    min-height: 180px !important;
+  }
+  .console-json, #console-output {
+    color: #f8fafc !important;
+    font-size: 11px !important;
+  }
+}
+
+/* Regras Globais de Terminal e Contraste */
+.console-json, #console-output {
+  color: #f8fafc !important;
+  font-family: 'JetBrains Mono', monospace !important;
+}
+.sample-placa, .sample-chassi, .sample-renavam, .sample-boleto, .cat-btn, #btn-mode-mercosul, #btn-mode-antiga {
+  min-height: 28px !important;
+  height: 28px !important;
+  line-height: 26px !important;
+  padding: 0 10px !important;
+  font-size: 11px !important;
+  border-radius: 6px !important;
+}
+
