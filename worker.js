@@ -636,6 +636,7 @@ export default {
       }
 
       const dados = resolucao.data;
+      const saudeFiscal = dados.saudeFiscal || auditarSaudeFiscalCnpj(cnpjClean, dados);
 
       // ─── Sub-rota: /api/cnpj/:cnpj/resumo (Ultraleve <200 bytes para checkout) ───
       if (subAction === 'resumo') {
@@ -730,7 +731,7 @@ export default {
           cnpj: dados.cnpj,
           cnpjFormatado: dados.cnpjFormatado,
           razaoSocial: dados.razaoSocial,
-          saudeFiscal: dados.saudeFiscal
+          saudeFiscal
         }, null, 2), {
           status: 200,
           headers: { 'Content-Type': 'application/json; charset=utf-8', ...CORS_HEADERS }
@@ -744,7 +745,7 @@ export default {
           cnpj: dados.cnpj,
           cnpjFormatado: dados.cnpjFormatado,
           razaoSocial: dados.razaoSocial,
-          certidaoNegativaDebitos: dados.saudeFiscal ? dados.saudeFiscal.certidaoNegativaDebitos : null
+          certidaoNegativaDebitos: saudeFiscal.certidaoNegativaDebitos
         }, null, 2), {
           status: 200,
           headers: { 'Content-Type': 'application/json; charset=utf-8', ...CORS_HEADERS }
@@ -758,7 +759,7 @@ export default {
           cnpj: dados.cnpj,
           cnpjFormatado: dados.cnpjFormatado,
           razaoSocial: dados.razaoSocial,
-          simplesNacional: dados.saudeFiscal ? dados.saudeFiscal.simplesNacional : null
+          simplesNacional: saudeFiscal.simplesNacional
         }, null, 2), {
           status: 200,
           headers: { 'Content-Type': 'application/json; charset=utf-8', ...CORS_HEADERS }
@@ -772,7 +773,7 @@ export default {
           cnpj: dados.cnpj,
           cnpjFormatado: dados.cnpjFormatado,
           razaoSocial: dados.razaoSocial,
-          dividaAtivaPgfn: dados.saudeFiscal ? dados.saudeFiscal.dividaAtivaPgfn : null
+          dividaAtivaPgfn: saudeFiscal.dividaAtivaPgfn
         }, null, 2), {
           status: 200,
           headers: { 'Content-Type': 'application/json; charset=utf-8', ...CORS_HEADERS }
@@ -815,6 +816,7 @@ export default {
             qualificacao: s.qualificacao
           })),
           validacaoEmpresaReal: dados.validacaoEmpresaReal,
+          saudeFiscal,
           fonte: resolucao.source,
           timestamp: new Date().toISOString()
         };
@@ -829,8 +831,9 @@ export default {
       const respostaPro = {
         ok: true,
         plano: 'Pro / Enterprise',
-        data: dados,
+        data: { ...dados, saudeFiscal },
         ...dados,
+        saudeFiscal,
         fonte: resolucao.source,
         timestamp: new Date().toISOString()
       };
