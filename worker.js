@@ -10,6 +10,7 @@
 import { STYLES_CSS, HTML_INDEX, OZPRO_MARK_SVG } from './site-assets.js';
 import { auditarSaudeFiscalCnpj, MOCKS_FISCAIS_CONHECIDOS, SUBLIMITES_SIMPLES_ESTADUAIS } from './saude-fiscal-pgfn.js';
 import { consultarDividasEmpresa, simularNegociacaoDividas, obterAcompanhamentoQuitacao } from './regularizacao-dividas-pro.js';
+import { auditarCertidoesOficiais, auditarComplianceEGrupo, COMPLIANCE_DATABASE } from './certidoes-compliance-pro.js';
 
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
@@ -816,6 +817,86 @@ export default {
         const parcelasPagas = parseInt(url.searchParams.get('parcelasPagas') || url.searchParams.get('pagas') || '3', 10);
         const timeline = obterAcompanhamentoQuitacao(cnpjClean, plano, parcelasPagas);
         return new Response(JSON.stringify(timeline, null, 2), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json; charset=utf-8', ...CORS_HEADERS }
+        });
+      }
+
+      // ─── Sub-rota: /api/cnpj/:cnpj/certidoes (Combo das 5 Certidões & Kit Licitação) ───
+      if (subAction === 'certidoes' || subAction === 'kit-licitacao') {
+        const certidoesData = auditarCertidoesOficiais(cnpjClean, dados);
+        return new Response(JSON.stringify({
+          ok: true,
+          ...certidoesData
+        }, null, 2), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json; charset=utf-8', ...CORS_HEADERS }
+        });
+      }
+
+      // ─── Sub-rota: /api/cnpj/:cnpj/compliance (Sintegra, Radar Siscomex, Grupo Econômico, Protestos & PEP) ───
+      if (subAction === 'compliance' || subAction === 'grupo-economico') {
+        const complianceData = auditarComplianceEGrupo(cnpjClean, dados);
+        return new Response(JSON.stringify({
+          ok: true,
+          ...complianceData
+        }, null, 2), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json; charset=utf-8', ...CORS_HEADERS }
+        });
+      }
+
+      // ─── Sub-rota: /api/cnpj/:cnpj/cndt (Certidão Negativa Trabalhista TST) ───
+      if (subAction === 'cndt') {
+        const certidoesData = auditarCertidoesOficiais(cnpjClean, dados);
+        return new Response(JSON.stringify({
+          ok: true,
+          cnpj: dados.cnpj,
+          razaoSocial: dados.razaoSocial,
+          cndtTrabalhista: certidoesData.certidoes.cndtTrabalhista
+        }, null, 2), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json; charset=utf-8', ...CORS_HEADERS }
+        });
+      }
+
+      // ─── Sub-rota: /api/cnpj/:cnpj/fgts ou /crf (Certificado FGTS Caixa) ───
+      if (subAction === 'fgts' || subAction === 'crf') {
+        const certidoesData = auditarCertidoesOficiais(cnpjClean, dados);
+        return new Response(JSON.stringify({
+          ok: true,
+          cnpj: dados.cnpj,
+          razaoSocial: dados.razaoSocial,
+          crfFgts: certidoesData.certidoes.crfFgts
+        }, null, 2), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json; charset=utf-8', ...CORS_HEADERS }
+        });
+      }
+
+      // ─── Sub-rota: /api/cnpj/:cnpj/sintegra ou /ie (Inscrição Estadual) ───
+      if (subAction === 'sintegra' || subAction === 'ie') {
+        const complianceData = auditarComplianceEGrupo(cnpjClean, dados);
+        return new Response(JSON.stringify({
+          ok: true,
+          cnpj: dados.cnpj,
+          razaoSocial: dados.razaoSocial,
+          inscricaoEstadual: complianceData.inscricaoEstadual
+        }, null, 2), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json; charset=utf-8', ...CORS_HEADERS }
+        });
+      }
+
+      // ─── Sub-rota: /api/cnpj/:cnpj/protestos (Protestos em Cartórios IEPTB) ───
+      if (subAction === 'protestos') {
+        const complianceData = auditarComplianceEGrupo(cnpjClean, dados);
+        return new Response(JSON.stringify({
+          ok: true,
+          cnpj: dados.cnpj,
+          razaoSocial: dados.razaoSocial,
+          protestosCartorio: complianceData.protestosCartorio
+        }, null, 2), {
           status: 200,
           headers: { 'Content-Type': 'application/json; charset=utf-8', ...CORS_HEADERS }
         });

@@ -327,6 +327,72 @@
     }
 
     /**
+     * Combo das 5 Certidões Oficiais (Federal, Trabalhista TST, FGTS Caixa, Estadual, Municipal)
+     * @param {string} cnpj
+     * @returns {Promise<Object>}
+     */
+    async consultarCertidoes(cnpj) {
+      const clean = this.limpar(cnpj);
+      if (!clean || clean.length !== 14) throw new Error('CNPJ inválido.');
+      return this._request(`/api/cnpj/${clean}/certidoes`);
+    }
+
+    /**
+     * Dossiê de Compliance Regulatória: Sintegra, Radar Siscomex, Teia Societária, Protestos e PEP
+     * @param {string} cnpj
+     * @returns {Promise<Object>}
+     */
+    async consultarCompliance(cnpj) {
+      const clean = this.limpar(cnpj);
+      if (!clean || clean.length !== 14) throw new Error('CNPJ inválido.');
+      return this._request(`/api/cnpj/${clean}/compliance`);
+    }
+
+    /**
+     * Certidão Negativa de Débitos Trabalhistas (CNDT) perante o TST / BNDT
+     * @param {string} cnpj
+     * @returns {Promise<Object>}
+     */
+    async consultarCndt(cnpj) {
+      const clean = this.limpar(cnpj);
+      if (!clean || clean.length !== 14) throw new Error('CNPJ inválido.');
+      return this._request(`/api/cnpj/${clean}/cndt`);
+    }
+
+    /**
+     * Certificado de Regularidade do FGTS (CRF) emitido pela Caixa Econômica Federal
+     * @param {string} cnpj
+     * @returns {Promise<Object>}
+     */
+    async consultarFgts(cnpj) {
+      const clean = this.limpar(cnpj);
+      if (!clean || clean.length !== 14) throw new Error('CNPJ inválido.');
+      return this._request(`/api/cnpj/${clean}/fgts`);
+    }
+
+    /**
+     * Inscrição Estadual e situação cadastral no Sintegra / CCC das 27 UFs
+     * @param {string} cnpj
+     * @returns {Promise<Object>}
+     */
+    async consultarSintegra(cnpj) {
+      const clean = this.limpar(cnpj);
+      if (!clean || clean.length !== 14) throw new Error('CNPJ inválido.');
+      return this._request(`/api/cnpj/${clean}/sintegra`);
+    }
+
+    /**
+     * Consulta factual de protestos de títulos em cartórios (IEPTB)
+     * @param {string} cnpj
+     * @returns {Promise<Object>}
+     */
+    async consultarProtestos(cnpj) {
+      const clean = this.limpar(cnpj);
+      if (!clean || clean.length !== 14) throw new Error('CNPJ inválido.');
+      return this._request(`/api/cnpj/${clean}/protestos`);
+    }
+
+    /**
      * Validação matemática com cálculo de ano de fundação estimado
      * @param {string} cnpj
      * @returns {Promise<Object>}
