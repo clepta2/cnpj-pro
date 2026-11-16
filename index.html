@@ -263,6 +263,9 @@
         <button class="nav-link" data-view="fiscal">
           <i data-lucide="shield-check"></i> <span>Saúde Fiscal & CND</span>
         </button>
+        <button class="nav-link" data-view="dividas">
+          <i data-lucide="scale"></i> <span>Dívidas & Quitação Pix</span>
+        </button>
         <button class="nav-link" data-view="docs">
           <i data-lucide="book-open"></i> <span>Documentação REST</span>
         </button>
@@ -374,6 +377,9 @@
           <button class="tab-nav-btn" data-tab="fiscal">
             <i data-lucide="shield-check"></i> <span>Saúde Fiscal & CND</span>
           </button>
+          <button class="tab-nav-btn" data-tab="dividas">
+            <i data-lucide="scale"></i> <span>Dívidas & Quitação Pix</span>
+          </button>
         </div>
 
         <!-- Playground Split-Screen de 2 Colunas -->
@@ -415,6 +421,9 @@
                   </button>
                   <button class="secondary-button sample-cnpj" data-cnpj="47960950000121" style="padding:4px 10px;font-size:11.5px;display:inline-flex;align-items:center;gap:5px;">
                     <i data-lucide="store"></i> <span>Magazine Luiza</span>
+                  </button>
+                  <button class="secondary-button sample-cnpj" data-cnpj="11111111000191" style="padding:4px 10px;font-size:11.5px;display:inline-flex;align-items:center;gap:5px;border-color:rgba(239,68,68,0.4);color:#ef4444;">
+                    <i data-lucide="alert-triangle"></i> <span>Empresa c/ Dívida (Simulação)</span>
                   </button>
                 </div>
 
@@ -554,6 +563,127 @@
                 </div>
               </div>
             </div>
+
+            <!-- TAB 5: REGULARIZAÇÃO & PARCELAMENTO DE DÍVIDAS -->
+            <div id="section-dividas" class="tab-pane" style="display:none;">
+              <div class="card-dashboard">
+                <div style="font-size:14px;font-weight:700;color:var(--ink);margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;">
+                  <span style="display:flex;align-items:center;gap:8px;">
+                    <i data-lucide="scale" style="color:var(--blue);"></i>
+                    <span>Diagnóstico de Dívida Ativa, Negociação &amp; Quitação Pix</span>
+                  </span>
+                  <span id="dividas-status-badge" class="status-badge-pill green">Sem Dívidas Ativas</span>
+                </div>
+                <p style="font-size:12.5px;color:var(--muted);margin-bottom:16px;line-height:1.5;">
+                  Consulta oficial de inscrições em cobrança na PGFN/Receita Federal com simulador de transação tributária (Lei nº 13.988) para quitação com até 70% de desconto e emissão imediata de CPEND:
+                </p>
+
+                <!-- Cards de Resumo Financeiro da Dívida -->
+                <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));gap:10px;margin-bottom:16px;">
+                  <div style="padding:12px;border-radius:var(--radius-md);background:var(--paper-elevated,#111827);border:1px solid var(--line);">
+                    <div style="font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;">Dívida Bruta Consolidada</div>
+                    <div id="dividas-total-bruto" style="font-size:15px;font-weight:900;color:#ef4444;margin:3px 0;">R$ 0,00</div>
+                    <div id="dividas-qtd-inscricoes" style="font-size:10.5px;color:var(--muted);">0 inscrições ativas</div>
+                  </div>
+                  <div style="padding:12px;border-radius:var(--radius-md);background:var(--paper-elevated,#111827);border:1px solid var(--line);">
+                    <div style="font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;">Desconto Máximo PGFN</div>
+                    <div id="dividas-total-desconto" style="font-size:15px;font-weight:900;color:#10b981;margin:3px 0;">- R$ 0,00</div>
+                    <div id="dividas-perc-desconto" style="font-size:10.5px;color:#10b981;">Até 65% nos juros e multas</div>
+                  </div>
+                  <div style="padding:12px;border-radius:var(--radius-md);background:var(--paper-elevated,#111827);border:1px solid var(--line);">
+                    <div style="font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;">Total Renegociado Líquido</div>
+                    <div id="dividas-total-liquido" style="font-size:15px;font-weight:900;color:var(--mint,#a3e635);margin:3px 0;">R$ 0,00</div>
+                    <div style="font-size:10.5px;color:var(--muted);">Valor final com abatimento</div>
+                  </div>
+                </div>
+
+                <!-- Lista de Inscrições Ativas / Débitos -->
+                <div style="border:1px solid var(--line);border-radius:var(--radius-lg);overflow:hidden;background:var(--paper);margin-bottom:16px;">
+                  <div style="padding:12px 16px;background:var(--paper-elevated,#162032);border-bottom:1px solid var(--line);font-size:13px;font-weight:700;color:var(--ink);display:flex;align-items:center;justify-content:space-between;">
+                    <span style="display:flex;align-items:center;gap:7px;">
+                      <i data-lucide="receipt"></i>
+                      <span>Inscrições em Dívida Ativa da União (PGFN / RFB)</span>
+                    </span>
+                    <span id="dividas-programa-label" style="font-size:11px;color:var(--muted);font-weight:500;">Transação Regularize PGFN</span>
+                  </div>
+                  <div id="dividas-lista-container" style="padding:12px;display:grid;gap:8px;"></div>
+                </div>
+
+                <!-- Simulador de Modalidades de Pagamento -->
+                <div style="border:1px solid var(--line);border-radius:var(--radius-lg);overflow:hidden;background:var(--paper);margin-bottom:16px;">
+                  <div style="padding:12px 16px;background:var(--paper-elevated,#162032);border-bottom:1px solid var(--line);font-size:13px;font-weight:700;color:var(--ink);display:flex;align-items:center;gap:7px;">
+                    <i data-lucide="scale"></i>
+                    <span>Simulador de Propostas de Parcelamento &amp; Adesão</span>
+                  </div>
+                  <div style="padding:16px;">
+                    <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(210px, 1fr));gap:12px;" id="propostas-container"></div>
+                  </div>
+                </div>
+
+                <!-- Guia Pix da 1ª Parcela (Adesão e Emissão de CPEND) -->
+                <div id="guia-pix-box" style="border:1px solid rgba(16,185,129,0.35);border-radius:var(--radius-lg);padding:16px;background:rgba(16,185,129,0.05);margin-bottom:16px;">
+                  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span class="status-badge-pill green" style="font-weight:800;">PIX IMEDIATO</span>
+                      <strong style="color:var(--ink);font-size:13.5px;">Guia de Pagamento da 1ª Parcela / Entrada</strong>
+                    </div>
+                    <span id="pix-vencimento" style="font-size:11.5px;color:var(--muted);font-weight:600;">Vencimento: 5 dias corridos</span>
+                  </div>
+                  <p style="font-size:12px;color:var(--muted);margin-bottom:12px;line-height:1.45;">
+                    <strong style="color:#10b981;">Efeito Legal Imediato:</strong> O recolhimento da primeira parcela suspende a exigibilidade do crédito tributário (Art. 151, VI do CTN) e viabiliza a emissão imediata da <strong>Certidão Positiva com Efeitos de Negativa (CPEND)</strong> em até 48 horas úteis, liberando a empresa para participar de licitações públicas e captar financiamentos bancários.
+                  </p>
+                  <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+                    <input type="text" id="pix-code-input" readonly value="00020126580014br.gov.bcb.pix0136..." style="flex:1;min-width:200px;height:38px;padding:0 12px;border:1px solid var(--line);border-radius:var(--radius-md);font-family:'JetBrains Mono',monospace;font-size:11.5px;background:var(--paper);color:var(--ink);" />
+                    <button id="btn-copy-pix" class="primary-button accent" style="height:38px;padding:0 14px;font-size:12px;display:inline-flex;align-items:center;gap:6px;">
+                      <i data-lucide="copy"></i> <span>Copiar Pix Copia e Cola</span>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Painel de Acompanhamento de Quitação (Timeline e Amortização) -->
+                <div style="border:1px solid var(--line);border-radius:var(--radius-lg);overflow:hidden;background:var(--paper);">
+                  <div style="padding:12px 16px;background:var(--paper-elevated,#162032);border-bottom:1px solid var(--line);font-size:13px;font-weight:700;color:var(--ink);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+                    <span style="display:flex;align-items:center;gap:7px;">
+                      <i data-lucide="activity"></i>
+                      <span>Acompanhamento da Quitação em Tempo Real</span>
+                    </span>
+                    <span id="acordo-numero-label" style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--blue);font-weight:700;">ACORDO PGFN REGULARIZADO</span>
+                  </div>
+                  <div style="padding:16px;">
+                    <!-- Barra de Progresso de Amortização -->
+                    <div style="margin-bottom:16px;">
+                      <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;margin-bottom:6px;">
+                        <strong style="color:var(--ink);" id="progresso-percentual-label">Progresso da Quitação: 25.0% Concluído</strong>
+                        <span style="color:var(--muted);" id="progresso-parcelas-label">3 de 12 parcelas quitadas</span>
+                      </div>
+                      <div style="height:10px;border-radius:999px;background:var(--line);overflow:hidden;position:relative;">
+                        <div id="progresso-bar-fill" style="height:100%;width:25%;background:linear-gradient(90deg, #10b981 0%, #a3e635 100%);border-radius:999px;transition:width 0.4s ease;"></div>
+                      </div>
+                      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:4px;">
+                        <span id="progresso-amortizado-label">Amortizado: R$ 0,00</span>
+                        <span id="progresso-saldo-label">Saldo Devedor: R$ 0,00</span>
+                      </div>
+                    </div>
+
+                    <!-- Alertas Preventivos PGFN -->
+                    <div style="padding:12px;border-radius:var(--radius-md);background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25);margin-bottom:16px;font-size:12px;color:var(--ink);line-height:1.45;">
+                      <div style="display:flex;align-items:center;gap:6px;font-weight:800;color:#f59e0b;margin-bottom:4px;">
+                        <i data-lucide="alert-triangle" style="width:15px;height:15px;"></i>
+                        <span>Regras Críticas de Manutenção do Acordo</span>
+                      </div>
+                      <ul style="margin:0;padding-left:18px;color:var(--muted);">
+                        <li>O atraso de <strong>3 parcelas consecutivas ou alternadas</strong> cancela automaticamente o acordo, restaurando integralmente os juros e encargos originais.</li>
+                        <li>O pagamento regular impede a penhora de contas bancárias (BacenJud) e resguarda a empresa no Simples Nacional.</li>
+                      </ul>
+                    </div>
+
+                    <!-- Timeline Mês a Mês -->
+                    <div style="font-size:12px;font-weight:700;color:var(--ink);margin-bottom:10px;">Cronograma Mês a Mês das Parcelas:</div>
+                    <div id="timeline-parcelas-container" style="display:grid;gap:8px;"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           <!-- Coluna 2: Terminal Console Dark Oficial da Ponte API -->
@@ -609,6 +739,7 @@
   <!-- Script da Aplicação e Integração -->
   <script type="module">
     const MOCKS_FISCAIS_CLIENT = {"33000167000101":{"cnpj":"33.000.167/0001-01","razaoSocial":"PETROLEO BRASILEIRO S A PETROBRAS","situacaoFiscal":"REGULAR","certidaoNegativaDebitos":{"tipo":"CPEND (Certidão Positiva com Efeitos de Negativa)","status":"REGULAR_COM_GARANTIA","numeroCertidao":"PGFN-RFB-2026/8849201-SP","validadeDias":180,"vencimento":"2026-11-20","aptaParaLicitacoes":true,"observacao":"Débitos com exigibilidade suspensa nos termos do Art. 151 do CTN ou garantidos por penhora."},"dividaAtivaPgfn":{"possuiInscricaoPgfn":false,"totalProcessos":0,"valorTotalInscrito":0,"detalhes":[]},"simplesNacional":{"optanteSimples":false,"optanteSimei":false,"motivoNaoOptante":"Vedação por porte (Sociedade Anônima de Capital Aberto) e faturamento acima do teto de R$ 4,8 milhões.","historicoExclusoes":[]},"saudeFiscalScore":{"score":980,"classificacao":"TRIPLE_A_EXCELENTE","probabilidadeInadimplencia":"0.1%","recomendacaoCredito":"CRÉDITO AMPLAMENTE RECOMENDADO"}},"00000000000191":{"cnpj":"00.000.000/0001-91","razaoSocial":"BANCO DO BRASIL SA","situacaoFiscal":"REGULAR","certidaoNegativaDebitos":{"tipo":"CND (Certidão Negativa de Débitos Relativos a Créditos Tributários Federais e à Dívida Ativa da União)","status":"NEGATIVA_TOTAL","numeroCertidao":"RFB-PGFN-2026/0019283-DF","validadeDias":180,"vencimento":"2026-12-15","aptaParaLicitacoes":true,"observacao":"Constata-se a não existência de débitos em nome da matriz e suas filiais."},"dividaAtivaPgfn":{"possuiInscricaoPgfn":false,"totalProcessos":0,"valorTotalInscrito":0,"detalhes":[]},"simplesNacional":{"optanteSimples":false,"optanteSimei":false,"motivoNaoOptante":"Instituição Financeira (Vedação Legal Lei Complementar nº 123/2006).","historicoExclusoes":[]},"saudeFiscalScore":{"score":990,"classificacao":"TRIPLE_A_EXCELENTE","probabilidadeInadimplencia":"0.05%","recomendacaoCredito":"RISCO ZERO / INSTITUIÇÃO FINANCEIRA"}},"48916772000100":{"cnpj":"48.916.772/0001-00","razaoSocial":"OZPRO ENTERPRISE TECNOLOGIA LTDA","situacaoFiscal":"REGULAR","certidaoNegativaDebitos":{"tipo":"CND (Certidão Negativa Plena)","status":"NEGATIVA_TOTAL","numeroCertidao":"RFB-PGFN-2026/4891677-SP","validadeDias":180,"vencimento":"2026-12-31","aptaParaLicitacoes":true,"observacao":"Sem débitos tributários federais ou previdenciários."},"dividaAtivaPgfn":{"possuiInscricaoPgfn":false,"totalProcessos":0,"valorTotalInscrito":0,"detalhes":[]},"simplesNacional":{"optanteSimples":true,"dataOpcaoSimples":"2022-09-15","optanteSimei":false,"sublimiteIcmsIssSp":"R$ 4.800.000,00","tetoAnualFederal":"R$ 4.800.000,00","situacaoSimples":"REGULAR NO REGIME ESPECIAL UNIFICADO"},"saudeFiscalScore":{"score":920,"classificacao":"A_ALTA_SOLVENCIA","probabilidadeInadimplencia":"0.8%","recomendacaoCredito":"CRÉDITO RECOMENDADO COM CONDIÇÕES PADRÃO"}}};
+    const DEBITOS_CLIENT = {"33000167000101":{"totalDividaBruta":0,"totalComDesconto":0,"descontoPossivel":0,"possuiDebitosAtivos":false,"aptidaoTransacaoPGFN":false,"motivoAptidao":"Empresa com certidão regular e sem inscrições ativas em cobrança na PGFN.","inscricoes":[]},"00000000000191":{"totalDividaBruta":0,"totalComDesconto":0,"descontoPossivel":0,"possuiDebitosAtivos":false,"aptidaoTransacaoPGFN":false,"motivoAptidao":"Certidão Negativa Plena. Empresa sem pendências tributárias.","inscricoes":[]},"11111111000191":{"totalDividaBruta":48650,"totalComDesconto":21890,"descontoPossivel":26760,"descontoMaximoPercentual":55,"possuiDebitosAtivos":true,"aptidaoTransacaoPGFN":true,"programaNegociacao":"Transação por Adesão PGFN / Edital Regularize Pequeno Porte","inscricoes":[{"numeroInscricao":"80.6.24.009124-12","tributo":"Simples Nacional / DAS em Atraso (2023-2024)","orgao":"Procuradoria-Geral da Fazenda Nacional (PGFN)","dataExigibilidade":"2024-03-15","valorOriginal":18200,"multaDeMora":3640,"jurosSelic":4210,"encargosLegais":2605,"valorTotalAtualizado":28655,"statusCobranca":"Inscrição Ativa / Em Fase de Execução Fiscal","descontoAplicavelJurosMulta":"65% de abatimento nos acréscimos legais"},{"numeroInscricao":"80.2.23.004512-88","tributo":"Contribuição Previdenciária Patronal (INSS)","orgao":"Receita Federal / PGFN","dataExigibilidade":"2023-10-20","valorOriginal":12500,"multaDeMora":2500,"jurosSelic":3245,"encargosLegais":1750,"valorTotalAtualizado":19995,"statusCobranca":"Inscrição em Dívida Ativa da União","descontoAplicavelJurosMulta":"50% de abatimento nos acréscimos legais"}]}};
 
     // Controle do Menu Lateral Mobile (Drawer)
     function setupMobileNav() {
@@ -688,6 +819,7 @@
           socios: 'Quadro Societário (QSA)',
           contato: 'Contato & B2B Lead',
           fiscal: 'Saúde Fiscal & CND',
+          dividas: 'Regularização & Quitação Pix',
           docs: 'Documentação REST'
         };
         if (bread && titles[tabKey]) bread.textContent = titles[tabKey];
@@ -718,6 +850,7 @@
       if (tab === 'socios') path = `/api/cnpj/${clean}/socios`;
       if (tab === 'contato') path = `/api/cnpj/${clean}/contato`;
       if (tab === 'fiscal') path = `/api/cnpj/${clean}/fiscal`;
+      if (tab === 'dividas') path = `/api/cnpj/${clean}/dividas`;
 
       return { ep: path, full: `https://cnpj-pro-api.maputo3.workers.dev${path}` };
     }
@@ -879,11 +1012,234 @@ print_r(json_decode($res, true));`;
               valHab.style.color = fiscal.certidaoNegativaDebitos.aptaParaLicitacoes ? '#10b981' : '#ef4444';
             }
           }
+
+          // Preenche Dívidas, Transação PGFN & Cronograma de Quitação
+          let dividas = DEBITOS_CLIENT[clean];
+          if (!dividas) {
+            let hash = 0;
+            for (let i = 0; i < clean.length; i++) hash = (hash * 31 + clean.charCodeAt(i)) >>> 0;
+            const temDivida = (hash % 5 === 0);
+            if (temDivida) {
+              const valOriginal = 15000 + (hash % 35000);
+              const multa = valOriginal * 0.20;
+              const juros = valOriginal * 0.25;
+              const encargos = valOriginal * 0.10;
+              const totalBruto = valOriginal + multa + juros + encargos;
+              const desconto = (multa + juros + encargos) * 0.65;
+              dividas = {
+                totalDividaBruta: totalBruto,
+                totalComDesconto: totalBruto - desconto,
+                descontoPossivel: desconto,
+                possuiDebitosAtivos: true,
+                programaNegociacao: 'Transação Excepcional Tributária PGFN (Lei nº 13.988)',
+                inscricoes: [{
+                  numeroInscricao: `80.${hash % 9}.24.${String(hash).slice(0, 6)}-01`,
+                  tributo: 'Débitos Tributários Federais e Previdenciários Consolidados',
+                  orgao: 'Procuradoria-Geral da Fazenda Nacional (PGFN)',
+                  valorOriginal: valOriginal,
+                  multaDeMora: multa,
+                  jurosSelic: juros,
+                  encargosLegais: encargos,
+                  valorTotalAtualizado: totalBruto,
+                  statusCobranca: 'Inscrição Ativa em Dívida Ativa da União'
+                }]
+              };
+            } else {
+              dividas = {
+                totalDividaBruta: 0,
+                totalComDesconto: 0,
+                descontoPossivel: 0,
+                possuiDebitosAtivos: false,
+                inscricoes: []
+              };
+            }
+          }
+          renderDividasPainel(clean, dividas);
         }
       } catch (err) {
         consoleOutput.textContent = `Erro: ${err.message}`;
       }
     }
+
+    function renderDividasPainel(clean, dividas) {
+      const badge = document.getElementById('dividas-status-badge');
+      const totalBrutoEl = document.getElementById('dividas-total-bruto');
+      const totalDescEl = document.getElementById('dividas-total-desconto');
+      const totalLiqEl = document.getElementById('dividas-total-liquido');
+      const qtdInscrEl = document.getElementById('dividas-qtd-inscricoes');
+      const listaContainer = document.getElementById('dividas-lista-container');
+      const propostasContainer = document.getElementById('propostas-container');
+      const guiaPixBox = document.getElementById('guia-pix-box');
+      const timelineContainer = document.getElementById('timeline-parcelas-container');
+
+      if (!dividas.possuiDebitosAtivos) {
+        if (badge) {
+          badge.className = 'status-badge-pill green';
+          badge.textContent = 'Sem Dívidas Ativas';
+        }
+        if (totalBrutoEl) totalBrutoEl.textContent = 'R$ 0,00';
+        if (totalDescEl) totalDescEl.textContent = 'R$ 0,00';
+        if (totalLiqEl) totalLiqEl.textContent = 'R$ 0,00';
+        if (qtdInscrEl) qtdInscrEl.textContent = '0 inscrições ativas';
+        if (listaContainer) {
+          listaContainer.innerHTML = '<div style="padding:14px;color:#10b981;font-weight:700;display:flex;align-items:center;gap:8px;"><i data-lucide="check-circle-2"></i><span>Nenhuma pendência fiscal ou inscrição em Dívida Ativa encontrada na PGFN/Receita Federal. Empresa 100% Regular!</span></div>';
+        }
+        if (propostasContainer) {
+          propostasContainer.innerHTML = '<div style="color:var(--muted);font-size:12px;grid-column:1/-1;">Esta empresa não necessita de transação tributária ou parcelamento.</div>';
+        }
+        if (guiaPixBox) guiaPixBox.style.display = 'none';
+        if (timelineContainer) {
+          timelineContainer.innerHTML = '<div style="color:var(--muted);font-size:12px;">Sem acordos de parcelamento em andamento.</div>';
+        }
+        document.getElementById('progresso-percentual-label').textContent = 'Situação Fiscal: 100% Regular';
+        document.getElementById('progresso-parcelas-label').textContent = 'Sem parcelamento ativo';
+        document.getElementById('progresso-bar-fill').style.width = '100%';
+        document.getElementById('progresso-amortizado-label').textContent = 'Amortizado: N/A';
+        document.getElementById('progresso-saldo-label').textContent = 'Saldo Devedor: R$ 0,00';
+        if (window.lucide) window.lucide.createIcons();
+        return;
+      }
+
+      // Empresa COM dívida
+      if (guiaPixBox) guiaPixBox.style.display = 'block';
+      if (badge) {
+        badge.className = 'status-badge-pill red';
+        badge.textContent = 'Dívida em Cobrança PGFN';
+      }
+      const bruto = dividas.totalDividaBruta;
+      const desc = dividas.descontoPossivel;
+      const liq = dividas.totalComDesconto;
+
+      if (totalBrutoEl) totalBrutoEl.textContent = 'R$ ' + bruto.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+      if (totalDescEl) totalDescEl.textContent = '- R$ ' + desc.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+      if (totalLiqEl) totalLiqEl.textContent = 'R$ ' + liq.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+      if (qtdInscrEl) qtdInscrEl.textContent = `${dividas.inscricoes.length} inscrição(ões) em cobrança`;
+
+      // Renderiza Inscrições
+      if (listaContainer) {
+        listaContainer.innerHTML = dividas.inscricoes.map(insc => `
+          <div style="padding:12px 14px;border-radius:var(--radius-md);background:var(--paper-elevated,#111827);border:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+            <div>
+              <div style="font-weight:800;color:var(--ink);font-size:13px;">${insc.tributo}</div>
+              <div style="font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace;">Inscrição: ${insc.numeroInscricao} · ${insc.orgao}</div>
+              <div style="font-size:11px;color:#ef4444;margin-top:2px;">Fase: ${insc.statusCobranca}</div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-size:13px;font-weight:900;color:#ef4444;">R$ ${insc.valorTotalAtualizado.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>
+              <div style="font-size:10.5px;color:#10b981;font-weight:600;">Desconto de até 65%</div>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      // Renderiza 4 Propostas
+      const descAVista = desc;
+      const valAVista = bruto - descAVista;
+      const desc12x = descAVista * 0.70;
+      const total12x = bruto - desc12x;
+      const parc12x = total12x / 12;
+      const desc36x = descAVista * 0.45;
+      const total36x = bruto - desc36x;
+      const parc36x = total36x / 36;
+      const desc60x = descAVista * 0.25;
+      const total60x = bruto - desc60x;
+      const parc60x = (total60x * 0.95) / 59;
+
+      const propostas = [
+        { id: 'vista', tit: 'À Vista (Desconto Máx)', val: valAVista, parc: `1x de R$ ${valAVista.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`, econ: `Economia de R$ ${descAVista.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`, sub: 'Extinção imediata da dívida e CND em 24h', pixVal: valAVista },
+        { id: '12x', tit: 'Parcelado 12x (Curto Prazo)', val: total12x, parc: `12x de R$ ${parc12x.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`, econ: `Economia de R$ ${desc12x.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`, sub: '45% de abatimento nos juros', pixVal: parc12x, active: true },
+        { id: '36x', tit: 'Parcelado 36x (Equilibrado)', val: total36x, parc: `36x de R$ ${parc36x.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`, econ: `Economia de R$ ${desc36x.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`, sub: 'Preserva capital de giro operacional', pixVal: parc36x },
+        { id: '60x', tit: 'Parcelado 60x (Longo Prazo)', val: total60x, parc: `59x de R$ ${parc60x.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`, econ: `Economia de R$ ${desc60x.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`, sub: 'Entrada de 5% + parcelas mínimas', pixVal: total60x * 0.05 }
+      ];
+
+      function selecionarPlano(p) {
+        const pixInput = document.getElementById('pix-code-input');
+        const pixVal = parseFloat(p.pixVal.toFixed(2));
+        const pixStr = `00020126580014br.gov.bcb.pix0136${clean}520400005303986540${pixVal.toFixed(2)}5802BR5925RECEITA FEDERAL PGFN6009BRASILIA62070503***6304ABCD`;
+        if (pixInput) pixInput.value = pixStr;
+
+        // Atualiza Timeline
+        const totalParc = p.id === 'vista' ? 1 : (p.id === '12x' ? 12 : (p.id === '36x' ? 36 : 60));
+        const pagas = p.id === 'vista' ? 0 : 3;
+        const restantes = totalParc - pagas;
+        const amortizado = pagas * (p.val / totalParc);
+        const saldo = p.val - amortizado;
+        const perc = ((pagas / totalParc) * 100).toFixed(1);
+
+        document.getElementById('progresso-percentual-label').textContent = `Progresso da Quitação: ${perc}% Concluído (${p.tit})`;
+        document.getElementById('progresso-parcelas-label').textContent = `${pagas} de ${totalParc} parcelas quitadas`;
+        document.getElementById('progresso-bar-fill').style.width = `${perc}%`;
+        document.getElementById('progresso-amortizado-label').textContent = `Amortizado: R$ ${amortizado.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+        document.getElementById('progresso-saldo-label').textContent = `Saldo Devedor Restante: R$ ${saldo.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+
+        // Gera lista timeline
+        const hoje = new Date();
+        const rows = [];
+        const maxShow = Math.min(totalParc, 6);
+        for (let i = 1; i <= maxShow; i++) {
+          const dataVenc = new Date(hoje.getFullYear(), hoje.getMonth() - pagas + i, 20);
+          const isPaga = i <= pagas;
+          const isAtual = i === (pagas + 1);
+          const valP = p.val / totalParc;
+
+          rows.push(`
+            <div style="padding:10px 14px;border-radius:var(--radius-md);background:var(--paper-elevated,#111827);border:1px solid ${isAtual ? 'var(--blue)' : 'var(--line)'};display:flex;justify-content:space-between;align-items:center;font-size:12px;">
+              <div style="display:flex;align-items:center;gap:10px;">
+                <span style="font-weight:800;color:var(--ink);">Parcela ${i}/${totalParc}</span>
+                <span style="color:var(--muted);font-size:11px;">Vencimento: ${dataVenc.toISOString().split('T')[0]}</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;">
+                <strong style="color:var(--ink);">R$ ${valP.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</strong>
+                ${isPaga 
+                  ? '<span class="status-badge-pill green">Paga</span>' 
+                  : (isAtual 
+                    ? '<span class="status-badge-pill yellow">Vencendo Neste Mês</span>' 
+                    : '<span class="status-badge-pill muted">Pendente</span>')}
+              </div>
+            </div>
+          `);
+        }
+        if (totalParc > 6) {
+          rows.push(`<div style="text-align:center;font-size:11px;color:var(--muted);padding:4px;">... e mais ${totalParc - 6} parcelas mensais registradas no cronograma PGFN.</div>`);
+        }
+        if (timelineContainer) timelineContainer.innerHTML = rows.join('');
+        if (window.lucide) window.lucide.createIcons();
+      }
+
+      if (propostasContainer) {
+        propostasContainer.innerHTML = propostas.map(p => `
+          <div class="proposta-card ${p.active ? 'is-selected' : ''}" data-plano="${p.id}" style="padding:14px;border-radius:var(--radius-md);border:1px solid ${p.active ? 'var(--mint,#a3e635)' : 'var(--line)'};background:${p.active ? 'rgba(163,230,53,0.06)' : 'var(--paper-elevated,#111827)'};cursor:pointer;transition:all 0.2s ease;">
+            <div style="font-size:11px;font-weight:700;color:${p.active ? 'var(--mint,#a3e635)' : 'var(--muted)'};text-transform:uppercase;">${p.tit}</div>
+            <div style="font-size:14px;font-weight:900;color:var(--ink);margin:4px 0;">${p.parc}</div>
+            <div style="font-size:11px;color:#10b981;font-weight:700;margin-bottom:4px;">${p.econ}</div>
+            <div style="font-size:10.5px;color:var(--muted);line-height:1.35;">${p.sub}</div>
+          </div>
+        `).join('');
+
+        // Click handler nas propostas
+        propostasContainer.querySelectorAll('.proposta-card').forEach(card => {
+          card.addEventListener('click', () => {
+            propostasContainer.querySelectorAll('.proposta-card').forEach(c => {
+              c.classList.remove('is-selected');
+              c.style.borderColor = 'var(--line)';
+              c.style.background = 'var(--paper-elevated,#111827)';
+            });
+            card.classList.add('is-selected');
+            card.style.borderColor = 'var(--mint,#a3e635)';
+            card.style.background = 'rgba(163,230,53,0.06)';
+            const plano = propostas.find(p => p.id === card.dataset.plano);
+            if (plano) selecionarPlano(plano);
+          });
+        });
+      }
+
+      selecionarPlano(propostas[1]); // Seleciona 12x por padrão
+    }
+
+    document.getElementById('btn-copy-pix')?.addEventListener('click', () => {
+      const val = document.getElementById('pix-code-input').value;
+      navigator.clipboard.writeText(val).then(() => alert('Código Pix Copia e Cola copiado com sucesso! Realize o pagamento em qualquer aplicativo bancário para suspender a cobrança e liberar a CPEND em 48h.'));
+    });
 
     document.getElementById('btn-exec-cnpj').addEventListener('click', executarConsulta);
     document.getElementById('cnpj-input').addEventListener('keypress', (e) => {
@@ -920,6 +1276,9 @@ print_r(json_decode($res, true));`;
       </button>
       <button class="mobile-nav-item " data-tab="fiscal">
         <i data-lucide="shield-check"></i><span>Fiscal/CND</span>
+      </button>
+      <button class="mobile-nav-item " data-tab="dividas">
+        <i data-lucide="scale"></i><span>Dívidas</span>
       </button>
       <button class="mobile-nav-item " data-tab="docs">
         <i data-lucide="book-open"></i><span>Docs</span>

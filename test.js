@@ -4,6 +4,7 @@
  */
 import worker, { validarDigitoCnpj } from './worker.js';
 import { auditarSaudeFiscalCnpj, SUBLIMITES_SIMPLES_ESTADUAIS } from './saude-fiscal-pgfn.js';
+import { consultarDividasEmpresa, simularNegociacaoDividas, obterAcompanhamentoQuitacao } from './regularizacao-dividas-pro.js';
 
 let passed = 0;
 let failed = 0;
@@ -138,6 +139,67 @@ const simplesResp = await worker.fetch(new Request('https://api.test/api/cnpj/00
 const simplesBody = await simplesResp.json();
 assert(simplesResp.status === 200, 'Rota /api/cnpj/:cnpj/simples responde com 200 OK');
 assert(simplesBody.simplesNacional !== undefined, 'Rota /simples retorna enquadramento tributário');
+
+// 6. Regularização, Transação Tributária & Cronograma de Quitação de Dívidas
+console.log('\n--- 6. Regularização de Dívidas & Acompanhamento de Quitação ---');
+const dividasEmpresa = consultarDividasEmpresa('11111111000191', { razaoSocial: 'EMPRESA TESTE DIVIDAS LTDA' });
+assert(dividasEmpresa.possuiDebitosAtivos === true, 'Empresa com débitos ativos identificada com sucesso');
+assert(dividasEmpresa.totalDividaBruta === 48650, 'Total da dívida bruta consolidado corretamente');
+assert(dividasEmpresa.inscricoes.length === 2, 'Retorna o detalhamento das 2 inscrições em cobrança');
+
+const dividasRegular = consultarDividasEmpresa('00000000000191');
+assert(dividasRegular.possuiDebitosAtivos === false, 'Empresa regular identificada sem débitos ativos');
+assert(dividasRegular.totalDividaBruta === 0, 'Dívida bruta zerada para empresa regular');
+
+// Simulação de Transação Tributária (Lei 13.988)
+const simulacao = simularNegociacaoDividas('11111111000191');
+assert(simulacao.ok === true, 'Simulação de renegociação calculada com sucesso');
+assert(simulacao.propostas.length === 4, 'Disponibiliza as 4 modalidades oficiais (À Vista, 12x, 36x, 60x)');
+assert(simulacao.propostas[0].modalidade === 'A_VISTA_DESCONTO_MAXIMO', 'Opção 1 é quitação integral à vista com desconto máximo');
+assert(simulacao.propostas[0].descontoConcedido === 26760, 'Desconto máximo de até R$ 26.760 aplicado');
+assert(simulacao.guiaPrimeiraParcela.codigoPixCopiaCola.includes('11111111000191'), 'Guia Pix Copia e Cola gerada para adesão imediata');
+
+// Acompanhamento e Timeline de Quitação
+const acompanhamento = obterAcompanhamentoQuitacao('11111111000191', '12x', 3);
+assert(acompanhamento.ok === true, 'Acompanhamento de quitação gerado com sucesso');
+assert(acompanhamento.progressoQuitacao.parcelasPagas === 3, 'Informa corretamente 3 parcelas pagas');
+assert(acompanhamento.progressoQuitacao.totalParcelas === 12, 'Total de 12 parcelas no plano escolhido');
+assert(acompanhamento.progressoQuitacao.percentualPago === '25.0%', 'Percentual de amortização calculado em 25.0%');
+assert(acompanhamento.cronogramaParcelas.length === 12, 'Cronograma completo de 12 meses gerado');
+assert(acompanhamento.cronogramaParcelas[0].status === 'PAGA_CONFIRMADA', 'Primeira parcela com status pago confirmado');
+assert(acompanhamento.cronogramaParcelas[3].status === 'VENCENDO_ESTE_MES', 'Parcela 4 identificada como vencendo neste mês');
+assert(acompanhamento.alertasManutencaoAcordo.length >= 2, 'Contém alertas legais contra atraso de 3 parcelas e perda do desconto');
+
+// Teste de Sub-rotas no Worker
+const mockEmpresaDividas = {
+  cnpj: '11111111000191',
+  cnpjFormatado: '11.111.111/0001-91',
+  razaoSocial: 'EMPRESA TESTE DIVIDAS LTDA',
+  situacaoCadastral: 'ATIVA',
+  cnaePrincipal: '4711302',
+  endereco: { uf: 'SP', municipio: 'São Paulo' }
+};
+
+const dividasResp = await worker.fetch(new Request('https://api.test/api/cnpj/11111111000191/dividas'), {
+  CNPJ_KV: { get: async () => mockEmpresaDividas }
+});
+const dividasBody = await dividasResp.json();
+assert(dividasResp.status === 200, 'Sub-rota /api/cnpj/:cnpj/dividas responde 200 OK');
+assert(dividasBody.possuiDebitosAtivos === true, 'Sub-rota /dividas retorna débitos ativos');
+
+const renegociarResp = await worker.fetch(new Request('https://api.test/api/cnpj/11111111000191/renegociar'), {
+  CNPJ_KV: { get: async () => mockEmpresaDividas }
+});
+const renegociarBody = await renegociarResp.json();
+assert(renegociarResp.status === 200, 'Sub-rota /api/cnpj/:cnpj/renegociar responde 200 OK');
+assert(renegociarBody.propostas !== undefined, 'Sub-rota /renegociar retorna propostas de parcelamento');
+
+const acompResp = await worker.fetch(new Request('https://api.test/api/cnpj/11111111000191/acompanhamento?plano=12x&parcelasPagas=3'), {
+  CNPJ_KV: { get: async () => mockEmpresaDividas }
+});
+const acompBody = await acompResp.json();
+assert(acompResp.status === 200, 'Sub-rota /api/cnpj/:cnpj/acompanhamento responde 200 OK');
+assert(acompBody.cronogramaParcelas !== undefined, 'Sub-rota /acompanhamento retorna timeline das parcelas');
 
 console.log(`\n📊 Resultado dos Testes: ${passed} passaram, ${failed} falharam.\n`);
 
