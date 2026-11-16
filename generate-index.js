@@ -1,6 +1,7 @@
 ﻿import fs from 'fs';
 import { MOCKS_FISCAIS_CONHECIDOS, SUBLIMITES_SIMPLES_ESTADUAIS } from './saude-fiscal-pgfn.js';
 import { DEBITOS_FISCAIS_DATABASE } from './regularizacao-dividas-pro.js';
+import { COMPLIANCE_DATABASE } from './certidoes-compliance-pro.js';
 
 const html = `<!DOCTYPE html>
 <html lang="pt-BR">
@@ -270,6 +271,9 @@ const html = `<!DOCTYPE html>
         <button class="nav-link" data-view="dividas">
           <i data-lucide="scale"></i> <span>Dívidas & Quitação Pix</span>
         </button>
+        <button class="nav-link" data-view="compliance">
+          <i data-lucide="file-check-2"></i> <span>Certidões & Compliance</span>
+        </button>
         <button class="nav-link" data-view="docs">
           <i data-lucide="book-open"></i> <span>Documentação REST</span>
         </button>
@@ -383,6 +387,9 @@ const html = `<!DOCTYPE html>
           </button>
           <button class="tab-nav-btn" data-tab="dividas">
             <i data-lucide="scale"></i> <span>Dívidas & Quitação Pix</span>
+          </button>
+          <button class="tab-nav-btn" data-tab="compliance">
+            <i data-lucide="file-check-2"></i> <span>Certidões & Compliance</span>
           </button>
         </div>
 
@@ -688,6 +695,119 @@ const html = `<!DOCTYPE html>
                 </div>
               </div>
             </div>
+
+            <!-- TAB 6: CERTIDÕES OFICIAIS & COMPLIANCE REGULATÓRIA -->
+            <div id="section-compliance" class="tab-pane" style="display:none;">
+              <div class="card-dashboard">
+                <div style="font-size:14px;font-weight:700;color:var(--ink);margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+                  <span style="display:flex;align-items:center;gap:8px;">
+                    <i data-lucide="file-check-2" style="color:var(--blue);"></i>
+                    <span>Combo de Certidões (Kit Licitação) &amp; Compliance Regulatória</span>
+                  </span>
+                  <span id="kit-licitacao-badge" class="status-badge-pill green">Apto para Licitações (5/5)</span>
+                </div>
+                <p style="font-size:12.5px;color:var(--muted);margin-bottom:16px;line-height:1.5;">
+                  Auditoria das 5 certidões obrigatórias exigidas pela Lei nº 14.133/2021 (Nova Lei de Licitações), Inscrição Estadual (Sintegra), Radar Siscomex e Grupo Econômico:
+                </p>
+
+                <!-- Grid com as 5 Certidões Oficiais -->
+                <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(210px, 1fr));gap:10px;margin-bottom:16px;">
+                  <!-- Certidão 1: CND Federal -->
+                  <div style="padding:12px;border-radius:var(--radius-md);background:var(--paper-elevated,#111827);border:1px solid var(--line);">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                      <span style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;">1. CND Federal / PGFN</span>
+                      <span id="badge-cert-federal" class="status-badge-pill green">Negativa</span>
+                    </div>
+                    <div id="val-cert-federal-num" style="font-size:11.5px;font-weight:800;color:var(--ink);font-family:'JetBrains Mono',monospace;">RFB-PGFN-2026/0019283</div>
+                    <div id="val-cert-federal-val" style="font-size:10.5px;color:var(--muted);margin-top:2px;">Validade: 180 dias</div>
+                  </div>
+
+                  <!-- Certidão 2: CNDT Trabalhista TST -->
+                  <div style="padding:12px;border-radius:var(--radius-md);background:var(--paper-elevated,#111827);border:1px solid var(--line);">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                      <span style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;">2. CNDT Trabalhista (TST)</span>
+                      <span id="badge-cert-cndt" class="status-badge-pill green">Negativa</span>
+                    </div>
+                    <div id="val-cert-cndt-num" style="font-size:11.5px;font-weight:800;color:var(--ink);font-family:'JetBrains Mono',monospace;">TST-CNDT-2026/492019</div>
+                    <div id="val-cert-cndt-val" style="font-size:10.5px;color:var(--muted);margin-top:2px;">Base: Lei 12.440 (BNDT)</div>
+                  </div>
+
+                  <!-- Certidão 3: CRF FGTS Caixa -->
+                  <div style="padding:12px;border-radius:var(--radius-md);background:var(--paper-elevated,#111827);border:1px solid var(--line);">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                      <span style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;">3. CRF FGTS (Caixa)</span>
+                      <span id="badge-cert-fgts" class="status-badge-pill green">Regular</span>
+                    </div>
+                    <div id="val-cert-fgts-num" style="font-size:11.5px;font-weight:800;color:var(--ink);font-family:'JetBrains Mono',monospace;">CRF-CEF-2026/194892</div>
+                    <div id="val-cert-fgts-val" style="font-size:10.5px;color:var(--muted);margin-top:2px;">Validade: 30 dias</div>
+                  </div>
+
+                  <!-- Certidão 4: CND Estadual SEFAZ -->
+                  <div style="padding:12px;border-radius:var(--radius-md);background:var(--paper-elevated,#111827);border:1px solid var(--line);">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                      <span style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;">4. CND Estadual (SEFAZ)</span>
+                      <span id="badge-cert-estadual" class="status-badge-pill green">Negativa</span>
+                    </div>
+                    <div id="val-cert-estadual-num" style="font-size:11.5px;font-weight:800;color:var(--ink);font-family:'JetBrains Mono',monospace;">SEFAZ-ICMS-2026/991823</div>
+                    <div id="val-cert-estadual-val" style="font-size:10.5px;color:var(--muted);margin-top:2px;">Tributos Estaduais</div>
+                  </div>
+
+                  <!-- Certidão 5: CND Municipal -->
+                  <div style="padding:12px;border-radius:var(--radius-md);background:var(--paper-elevated,#111827);border:1px solid var(--line);">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                      <span style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;">5. CND Municipal (ISS)</span>
+                      <span id="badge-cert-municipal" class="status-badge-pill green">Negativa</span>
+                    </div>
+                    <div id="val-cert-municipal-num" style="font-size:11.5px;font-weight:800;color:var(--ink);font-family:'JetBrains Mono',monospace;">MUN-ISS-2026/112093</div>
+                    <div id="val-cert-municipal-val" style="font-size:10.5px;color:var(--muted);margin-top:2px;">Tributos Mobiliários</div>
+                  </div>
+                </div>
+
+                <!-- Painel de Inscrição Estadual, Sintegra e Radar Siscomex -->
+                <div style="border:1px solid var(--line);border-radius:var(--radius-lg);overflow:hidden;background:var(--paper);margin-bottom:16px;">
+                  <div style="padding:12px 16px;background:var(--paper-elevated,#162032);border-bottom:1px solid var(--line);font-size:13px;font-weight:700;color:var(--ink);display:flex;align-items:center;gap:7px;">
+                    <i data-lucide="shield-check"></i>
+                    <span>Registros Regulatórios, Sintegra &amp; Comércio Exterior</span>
+                  </div>
+                  <table class="specs-table">
+                    <tbody>
+                      <tr>
+                        <td class="label-col">Inscrição Estadual (IE)</td>
+                        <td class="val-col" id="val-comp-ie" style="font-family:'JetBrains Mono',monospace;font-weight:700;">110.042.490.114 (SP)</td>
+                      </tr>
+                      <tr>
+                        <td class="label-col">Situação no Sintegra / CCC</td>
+                        <td class="val-col" id="val-comp-sintegra"><span class="status-badge-pill green">HABILITADA ATIVA</span></td>
+                      </tr>
+                      <tr>
+                        <td class="label-col">Radar Siscomex (Aduana RFB)</td>
+                        <td class="val-col" id="val-comp-radar" style="font-weight:700;color:#10b981;">HABILITADA ILIMITADA (Importador / Exportador)</td>
+                      </tr>
+                      <tr>
+                        <td class="label-col">Cartórios de Protesto (IEPTB)</td>
+                        <td class="val-col" id="val-comp-protestos"><span class="status-badge-pill green">NADA CONSTA EM CARTÓRIOS</span></td>
+                      </tr>
+                      <tr>
+                        <td class="label-col">Conformidade PEP (CGU / COAF)</td>
+                        <td class="val-col" id="val-comp-pep" style="color:#10b981;font-weight:600;">Sem registros de Pessoas Expostas Politicamente</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <!-- Painel de Teia Societária Forense & Grupo Econômico (Deep QSA) -->
+                <div style="border:1px solid var(--line);border-radius:var(--radius-lg);overflow:hidden;background:var(--paper);">
+                  <div style="padding:12px 16px;background:var(--paper-elevated,#162032);border-bottom:1px solid var(--line);font-size:13px;font-weight:700;color:var(--ink);display:flex;align-items:center;justify-content:space-between;">
+                    <span style="display:flex;align-items:center;gap:7px;">
+                      <i data-lucide="layers"></i>
+                      <span>Teia Societária Forense &amp; Empresas do Grupo Econômico</span>
+                    </span>
+                    <span id="grupo-economico-count" style="font-size:11px;color:var(--muted);">Mapeamento por Sócios em Comum</span>
+                  </div>
+                  <div id="grupo-economico-container" style="padding:12px;display:grid;gap:8px;"></div>
+                </div>
+              </div>
+            </div>
           </div>
 
           <!-- Coluna 2: Terminal Console Dark Oficial da Ponte API -->
@@ -746,6 +866,7 @@ const html = `<!DOCTYPE html>
   <script type="module">
     const MOCKS_FISCAIS_CLIENT = ${JSON.stringify(MOCKS_FISCAIS_CONHECIDOS)};
     const DEBITOS_CLIENT = ${JSON.stringify(DEBITOS_FISCAIS_DATABASE)};
+    const COMPLIANCE_CLIENT = ${JSON.stringify(COMPLIANCE_DATABASE)};
 
     // Controle do Menu Lateral Mobile (Drawer)
     function setupMobileNav() {
@@ -826,6 +947,7 @@ const html = `<!DOCTYPE html>
           contato: 'Contato & B2B Lead',
           fiscal: 'Saúde Fiscal & CND',
           dividas: 'Regularização & Quitação Pix',
+          compliance: 'Certidões & Compliance',
           docs: 'Documentação REST'
         };
         if (bread && titles[tabKey]) bread.textContent = titles[tabKey];
@@ -857,6 +979,7 @@ const html = `<!DOCTYPE html>
       if (tab === 'contato') path = \`/api/cnpj/\${clean}/contato\`;
       if (tab === 'fiscal') path = \`/api/cnpj/\${clean}/fiscal\`;
       if (tab === 'dividas') path = \`/api/cnpj/\${clean}/dividas\`;
+      if (tab === 'compliance') path = \`/api/cnpj/\${clean}/certidoes\`;
 
       return { ep: path, full: \`https://cnpj-pro-api.maputo3.workers.dev\${path}\` };
     }
