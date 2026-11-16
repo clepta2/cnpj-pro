@@ -85,7 +85,24 @@ function isPlaceholder(val) {
   );
 }
 
-export function executarAuditoriaSeguranca(repoDir = process.cwd()) {
+// Cálculo de Entropia de Shannon para detectar tokens altamente aleatórios
+function calcularEntropiaShannon(token) {
+  if (!token || token.length < 20) return 0;
+  const frequencias = {};
+  for (let i = 0; i < token.length; i++) {
+    const c = token[i];
+    frequencias[c] = (frequencias[c] || 0) + 1;
+  }
+  let entropia = 0;
+  const len = token.length;
+  for (const c in frequencias) {
+    const p = frequencias[c] / len;
+    entropia -= p * Math.log2(p);
+  }
+  return entropia;
+}
+
+export function executarAuditoriaSeguranca(repoDir = process.cwd(), isPrePush = false) {
   let violacoes = 0;
   const erros = [];
 
@@ -105,11 +122,44 @@ export function executarAuditoriaSeguranca(repoDir = process.cwd()) {
     arquivos = [...new Set([...arquivos, ...stagedFiles])];
   } catch (_) {}
 
+  // 2. Se for pre-push, inspeciona os commits não enviados para o remote
+  if (isPrePush) {
+    try {
+      let unpushedDiff = '';
+      try {
+        unpushedDiff = execSync('git log @{u}..HEAD -p', { cwd: repoDir, encoding: 'utf8' });
+      } catch (_) {
+        unpushedDiff = execSync('git log -n 5 -p', { cwd: repoDir, encoding: 'utf8' });
+      }
+
+      for (const pattern of SECRET_PATTERNS) {
+        const matches = unpushedDiff.match(pattern.regex);
+        if (matches) {
+          for (const m of matches) {
+            if (!isPlaceholder(m)) {
+              violacoes++;
+              const mascarado = m.length > 12 ? `${m.slice(0, 8)}...${m.slice(-4)}` : '******';
+              erros.push(`[PRE-PUSH BLOQUEADO] Segredo detectado em commit não enviado: ${pattern.nome} -> ${mascarado}`);
+            }
+          }
+        }
+      }
+    } catch (_) {}
+  }
+
   for (const relPath of arquivos) {
     const baseName = path.basename(relPath);
 
     // Ignora o próprio script de auditoria e arquivos de regras/instruções que documentam os padrões proibidos
-    if (baseName === 'security-guard.js' || baseName === 'audit-secrets.js' || relPath.endsWith('.instructions.md')) continue;
+    if (
+      baseName === 'security-guard.js' ||
+      baseName === 'audit-secrets.js' ||
+      baseName === 'install-hard-security-rules.js' ||
+      baseName === 'install-extended-security.js' ||
+      relPath.endsWith('.instructions.md')
+    ) {
+      continue;
+    }
 
     // A. Verifica arquivos proibidos no Git
     for (const reg of FORBIDDEN_FILES) {
@@ -119,7 +169,30 @@ export function executarAuditoriaSeguranca(repoDir = process.cwd()) {
       }
     }
 
-    // B. Verifica conteúdo dos arquivos de código
+    // B. Verifica arquivos .env.example para assegurar que só tenham placeholders
+    if (baseName.includes('.example')) {
+      const absPath = path.join(repoDir, relPath);
+      if (fs.existsSync(absPath)) {
+        const lines = fs.readFileSync(absPath, 'utf8').split(/\r?\n/);
+        lines.forEach((l, idx) => {
+          if (l.trim() && !l.startsWith('#')) {
+            const eq = l.indexOf('=');
+            if (eq > 0) {
+              const val = l.slice(eq + 1).trim();
+              if (val.length > 25 && !isPlaceholder(val) && !val.startsWith('http')) {
+                const ent = calcularEntropiaShannon(val);
+                if (ent > 4.5) {
+                  violacoes++;
+                  erros.push(`[VALOR REAL EM .EXAMPLE] ${relPath}:${idx + 1} parece conter um segredo real (Entropia: ${ent.toFixed(2)}). Use apenas placeholders.`);
+                }
+              }
+            }
+          }
+        });
+      }
+    }
+
+    // C. Verifica conteúdo dos arquivos de código
     const absPath = path.join(repoDir, relPath);
     if (!fs.existsSync(absPath)) continue;
 
@@ -149,12 +222,13 @@ export function executarAuditoriaSeguranca(repoDir = process.cwd()) {
 
 // Execução Direta via CLI
 if (import.meta.url === `file:///${process.argv[1].replace(/\\/g, '/')}`) {
-  console.log('🛡️ Executando Guarda de Segurança (Zero Hardcoded Secrets)...\n');
-  const res = executarAuditoriaSeguranca(process.cwd());
+  const isPrePush = process.argv.includes('--pre-push');
+  console.log(`🛡️ Executando Guarda de Segurança (Zero Hardcoded Secrets) [Modo: ${isPrePush ? 'PRE-PUSH' : 'PRE-COMMIT/CI'}]...\n`);
+  const res = executarAuditoriaSeguranca(process.cwd(), isPrePush);
 
   if (!res.ok) {
     console.error('========================================================================');
-    console.error('🚨 VIOLAÇÃO DE SEGURANÇA DETECTADA: O COMMIT / BUILD FOI ABORTADO!    ');
+    console.error(`🚨 VIOLAÇÃO DE SEGURANÇA DETECTADA: O ${isPrePush ? 'PUSH' : 'COMMIT/BUILD'} FOI ABORTADO!`);
     console.error('========================================================================\n');
     res.erros.forEach(e => console.error(`  ❌ ${e}`));
     console.error('\n⚠️ REGRA INVIOLÁVEL:');
@@ -163,7 +237,7 @@ if (import.meta.url === `file:///${process.argv[1].replace(/\\/g, '/')}`) {
     console.error('  3. Arquivos .env e .dev.vars devem estar sempre no .gitignore.\n');
     process.exit(1);
   } else {
-    console.log('✅ Guarda de Segurança: NENHUM segredo detectado. O código está 100% seguro.');
+    console.log(`✅ Guarda de Segurança: NENHUM segredo detectado. O ${isPrePush ? 'push' : 'código'} está 100% seguro.`);
     process.exit(0);
   }
 }

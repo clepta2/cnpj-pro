@@ -1,0 +1,49 @@
+title = "Ponte API Gitleaks Configuration - Zero Hardcoded Secrets"
+
+[extend]
+useDefault = true
+
+[[rules]]
+id = "supabase-jwt"
+description = "Supabase Anon / Service Role JWT Secret"
+regex = '''eyJhbGciOi[a-zA-Z0-9_\-]+\.[a-zA-Z0-9_\-]+\.[a-zA-Z0-9_\-]+'''
+keywords = ["eyJhbGciOi"]
+
+[[rules]]
+id = "ai-sk-token"
+description = "AI Secret Key (OpenAI / OmniRouter)"
+regex = '''sk-[a-zA-Z0-9_\-]{20,}'''
+keywords = ["sk-"]
+
+[[rules]]
+id = "cloudflare-api-token"
+description = "Cloudflare API Token"
+regex = '''cfat_[a-zA-Z0-9_\-]{20,}'''
+keywords = ["cfat_"]
+
+[[rules]]
+id = "google-api-key"
+description = "Google Gemini / AI API Key"
+regex = '''AIzaSy[a-zA-Z0-9_\-]{33}'''
+keywords = ["AIzaSy"]
+
+[[rules]]
+id = "groq-api-key"
+description = "Groq API Key"
+regex = '''gsk_[a-zA-Z0-9_\-]{20,}'''
+keywords = ["gsk_"]
+
+[allowlist]
+description = "Allow placeholders, documentation, and mocks"
+regexes = [
+  '''(?i)(dummy|example|placeholder|mock|change-me|sua_chave|seu_token|your_token|pnt_test_mock)''',
+  '''sk-diffai-master-key''',
+  '''sk-quest'''
+]
+paths = [
+  '''scripts/security-guard\.js''',
+  '''scripts/audit-secrets\.js''',
+  '''scripts/install-hard-security-rules\.js''',
+  '''scripts/install-extended-security\.js''',
+  '''\.instructions\.md$'''
+]

@@ -7,7 +7,8 @@
   "types": "types/index.d.ts",
   "scripts": {
     "test": "node test.js",
-    "deploy": "wrangler deploy"
+    "deploy": "wrangler deploy",
+    "security:check": "node scripts/security-guard.js"
   },
   "keywords": [
     "cnpj",
