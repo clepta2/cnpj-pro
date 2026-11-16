@@ -21,5 +21,8 @@ jobs:
         with:
           node-version: 22
 
+      - name: Auditoria de Segredos (Zero Hardcoded Secrets)
+        run: node scripts/security-guard.js
+
       - name: Executar Testes
         run: node test.js

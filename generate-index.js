@@ -1,5 +1,6 @@
 ﻿import fs from 'fs';
 import { MOCKS_FISCAIS_CONHECIDOS, SUBLIMITES_SIMPLES_ESTADUAIS } from './saude-fiscal-pgfn.js';
+import { DEBITOS_FISCAIS_DATABASE } from './regularizacao-dividas-pro.js';
 
 const html = `<!DOCTYPE html>
 <html lang="pt-BR">
@@ -266,6 +267,9 @@ const html = `<!DOCTYPE html>
         <button class="nav-link" data-view="fiscal">
           <i data-lucide="shield-check"></i> <span>Saúde Fiscal & CND</span>
         </button>
+        <button class="nav-link" data-view="dividas">
+          <i data-lucide="scale"></i> <span>Dívidas & Quitação Pix</span>
+        </button>
         <button class="nav-link" data-view="docs">
           <i data-lucide="book-open"></i> <span>Documentação REST</span>
         </button>
@@ -377,6 +381,9 @@ const html = `<!DOCTYPE html>
           <button class="tab-nav-btn" data-tab="fiscal">
             <i data-lucide="shield-check"></i> <span>Saúde Fiscal & CND</span>
           </button>
+          <button class="tab-nav-btn" data-tab="dividas">
+            <i data-lucide="scale"></i> <span>Dívidas & Quitação Pix</span>
+          </button>
         </div>
 
         <!-- Playground Split-Screen de 2 Colunas -->
@@ -418,6 +425,9 @@ const html = `<!DOCTYPE html>
                   </button>
                   <button class="secondary-button sample-cnpj" data-cnpj="47960950000121" style="padding:4px 10px;font-size:11.5px;display:inline-flex;align-items:center;gap:5px;">
                     <i data-lucide="store"></i> <span>Magazine Luiza</span>
+                  </button>
+                  <button class="secondary-button sample-cnpj" data-cnpj="11111111000191" style="padding:4px 10px;font-size:11.5px;display:inline-flex;align-items:center;gap:5px;border-color:rgba(239,68,68,0.4);color:#ef4444;">
+                    <i data-lucide="alert-triangle"></i> <span>Empresa c/ Dívida (Simulação)</span>
                   </button>
                 </div>
 
@@ -557,6 +567,127 @@ const html = `<!DOCTYPE html>
                 </div>
               </div>
             </div>
+
+            <!-- TAB 5: REGULARIZAÇÃO & PARCELAMENTO DE DÍVIDAS -->
+            <div id="section-dividas" class="tab-pane" style="display:none;">
+              <div class="card-dashboard">
+                <div style="font-size:14px;font-weight:700;color:var(--ink);margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;">
+                  <span style="display:flex;align-items:center;gap:8px;">
+                    <i data-lucide="scale" style="color:var(--blue);"></i>
+                    <span>Diagnóstico de Dívida Ativa, Negociação &amp; Quitação Pix</span>
+                  </span>
+                  <span id="dividas-status-badge" class="status-badge-pill green">Sem Dívidas Ativas</span>
+                </div>
+                <p style="font-size:12.5px;color:var(--muted);margin-bottom:16px;line-height:1.5;">
+                  Consulta oficial de inscrições em cobrança na PGFN/Receita Federal com simulador de transação tributária (Lei nº 13.988) para quitação com até 70% de desconto e emissão imediata de CPEND:
+                </p>
+
+                <!-- Cards de Resumo Financeiro da Dívida -->
+                <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));gap:10px;margin-bottom:16px;">
+                  <div style="padding:12px;border-radius:var(--radius-md);background:var(--paper-elevated,#111827);border:1px solid var(--line);">
+                    <div style="font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;">Dívida Bruta Consolidada</div>
+                    <div id="dividas-total-bruto" style="font-size:15px;font-weight:900;color:#ef4444;margin:3px 0;">R$ 0,00</div>
+                    <div id="dividas-qtd-inscricoes" style="font-size:10.5px;color:var(--muted);">0 inscrições ativas</div>
+                  </div>
+                  <div style="padding:12px;border-radius:var(--radius-md);background:var(--paper-elevated,#111827);border:1px solid var(--line);">
+                    <div style="font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;">Desconto Máximo PGFN</div>
+                    <div id="dividas-total-desconto" style="font-size:15px;font-weight:900;color:#10b981;margin:3px 0;">- R$ 0,00</div>
+                    <div id="dividas-perc-desconto" style="font-size:10.5px;color:#10b981;">Até 65% nos juros e multas</div>
+                  </div>
+                  <div style="padding:12px;border-radius:var(--radius-md);background:var(--paper-elevated,#111827);border:1px solid var(--line);">
+                    <div style="font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;">Total Renegociado Líquido</div>
+                    <div id="dividas-total-liquido" style="font-size:15px;font-weight:900;color:var(--mint,#a3e635);margin:3px 0;">R$ 0,00</div>
+                    <div style="font-size:10.5px;color:var(--muted);">Valor final com abatimento</div>
+                  </div>
+                </div>
+
+                <!-- Lista de Inscrições Ativas / Débitos -->
+                <div style="border:1px solid var(--line);border-radius:var(--radius-lg);overflow:hidden;background:var(--paper);margin-bottom:16px;">
+                  <div style="padding:12px 16px;background:var(--paper-elevated,#162032);border-bottom:1px solid var(--line);font-size:13px;font-weight:700;color:var(--ink);display:flex;align-items:center;justify-content:space-between;">
+                    <span style="display:flex;align-items:center;gap:7px;">
+                      <i data-lucide="receipt"></i>
+                      <span>Inscrições em Dívida Ativa da União (PGFN / RFB)</span>
+                    </span>
+                    <span id="dividas-programa-label" style="font-size:11px;color:var(--muted);font-weight:500;">Transação Regularize PGFN</span>
+                  </div>
+                  <div id="dividas-lista-container" style="padding:12px;display:grid;gap:8px;"></div>
+                </div>
+
+                <!-- Simulador de Modalidades de Pagamento -->
+                <div style="border:1px solid var(--line);border-radius:var(--radius-lg);overflow:hidden;background:var(--paper);margin-bottom:16px;">
+                  <div style="padding:12px 16px;background:var(--paper-elevated,#162032);border-bottom:1px solid var(--line);font-size:13px;font-weight:700;color:var(--ink);display:flex;align-items:center;gap:7px;">
+                    <i data-lucide="scale"></i>
+                    <span>Simulador de Propostas de Parcelamento &amp; Adesão</span>
+                  </div>
+                  <div style="padding:16px;">
+                    <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(210px, 1fr));gap:12px;" id="propostas-container"></div>
+                  </div>
+                </div>
+
+                <!-- Guia Pix da 1ª Parcela (Adesão e Emissão de CPEND) -->
+                <div id="guia-pix-box" style="border:1px solid rgba(16,185,129,0.35);border-radius:var(--radius-lg);padding:16px;background:rgba(16,185,129,0.05);margin-bottom:16px;">
+                  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span class="status-badge-pill green" style="font-weight:800;">PIX IMEDIATO</span>
+                      <strong style="color:var(--ink);font-size:13.5px;">Guia de Pagamento da 1ª Parcela / Entrada</strong>
+                    </div>
+                    <span id="pix-vencimento" style="font-size:11.5px;color:var(--muted);font-weight:600;">Vencimento: 5 dias corridos</span>
+                  </div>
+                  <p style="font-size:12px;color:var(--muted);margin-bottom:12px;line-height:1.45;">
+                    <strong style="color:#10b981;">Efeito Legal Imediato:</strong> O recolhimento da primeira parcela suspende a exigibilidade do crédito tributário (Art. 151, VI do CTN) e viabiliza a emissão imediata da <strong>Certidão Positiva com Efeitos de Negativa (CPEND)</strong> em até 48 horas úteis, liberando a empresa para participar de licitações públicas e captar financiamentos bancários.
+                  </p>
+                  <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+                    <input type="text" id="pix-code-input" readonly value="00020126580014br.gov.bcb.pix0136..." style="flex:1;min-width:200px;height:38px;padding:0 12px;border:1px solid var(--line);border-radius:var(--radius-md);font-family:'JetBrains Mono',monospace;font-size:11.5px;background:var(--paper);color:var(--ink);" />
+                    <button id="btn-copy-pix" class="primary-button accent" style="height:38px;padding:0 14px;font-size:12px;display:inline-flex;align-items:center;gap:6px;">
+                      <i data-lucide="copy"></i> <span>Copiar Pix Copia e Cola</span>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Painel de Acompanhamento de Quitação (Timeline e Amortização) -->
+                <div style="border:1px solid var(--line);border-radius:var(--radius-lg);overflow:hidden;background:var(--paper);">
+                  <div style="padding:12px 16px;background:var(--paper-elevated,#162032);border-bottom:1px solid var(--line);font-size:13px;font-weight:700;color:var(--ink);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+                    <span style="display:flex;align-items:center;gap:7px;">
+                      <i data-lucide="activity"></i>
+                      <span>Acompanhamento da Quitação em Tempo Real</span>
+                    </span>
+                    <span id="acordo-numero-label" style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--blue);font-weight:700;">ACORDO PGFN REGULARIZADO</span>
+                  </div>
+                  <div style="padding:16px;">
+                    <!-- Barra de Progresso de Amortização -->
+                    <div style="margin-bottom:16px;">
+                      <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;margin-bottom:6px;">
+                        <strong style="color:var(--ink);" id="progresso-percentual-label">Progresso da Quitação: 25.0% Concluído</strong>
+                        <span style="color:var(--muted);" id="progresso-parcelas-label">3 de 12 parcelas quitadas</span>
+                      </div>
+                      <div style="height:10px;border-radius:999px;background:var(--line);overflow:hidden;position:relative;">
+                        <div id="progresso-bar-fill" style="height:100%;width:25%;background:linear-gradient(90deg, #10b981 0%, #a3e635 100%);border-radius:999px;transition:width 0.4s ease;"></div>
+                      </div>
+                      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:4px;">
+                        <span id="progresso-amortizado-label">Amortizado: R$ 0,00</span>
+                        <span id="progresso-saldo-label">Saldo Devedor: R$ 0,00</span>
+                      </div>
+                    </div>
+
+                    <!-- Alertas Preventivos PGFN -->
+                    <div style="padding:12px;border-radius:var(--radius-md);background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25);margin-bottom:16px;font-size:12px;color:var(--ink);line-height:1.45;">
+                      <div style="display:flex;align-items:center;gap:6px;font-weight:800;color:#f59e0b;margin-bottom:4px;">
+                        <i data-lucide="alert-triangle" style="width:15px;height:15px;"></i>
+                        <span>Regras Críticas de Manutenção do Acordo</span>
+                      </div>
+                      <ul style="margin:0;padding-left:18px;color:var(--muted);">
+                        <li>O atraso de <strong>3 parcelas consecutivas ou alternadas</strong> cancela automaticamente o acordo, restaurando integralmente os juros e encargos originais.</li>
+                        <li>O pagamento regular impede a penhora de contas bancárias (BacenJud) e resguarda a empresa no Simples Nacional.</li>
+                      </ul>
+                    </div>
+
+                    <!-- Timeline Mês a Mês -->
+                    <div style="font-size:12px;font-weight:700;color:var(--ink);margin-bottom:10px;">Cronograma Mês a Mês das Parcelas:</div>
+                    <div id="timeline-parcelas-container" style="display:grid;gap:8px;"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           <!-- Coluna 2: Terminal Console Dark Oficial da Ponte API -->
@@ -614,6 +745,7 @@ const html = `<!DOCTYPE html>
   <!-- Script da Aplicação e Integração -->
   <script type="module">
     const MOCKS_FISCAIS_CLIENT = ${JSON.stringify(MOCKS_FISCAIS_CONHECIDOS)};
+    const DEBITOS_CLIENT = ${JSON.stringify(DEBITOS_FISCAIS_DATABASE)};
 
     // Controle do Menu Lateral Mobile (Drawer)
     function setupMobileNav() {
@@ -693,6 +825,7 @@ const html = `<!DOCTYPE html>
           socios: 'Quadro Societário (QSA)',
           contato: 'Contato & B2B Lead',
           fiscal: 'Saúde Fiscal & CND',
+          dividas: 'Regularização & Quitação Pix',
           docs: 'Documentação REST'
         };
         if (bread && titles[tabKey]) bread.textContent = titles[tabKey];
@@ -723,6 +856,7 @@ const html = `<!DOCTYPE html>
       if (tab === 'socios') path = \`/api/cnpj/\${clean}/socios\`;
       if (tab === 'contato') path = \`/api/cnpj/\${clean}/contato\`;
       if (tab === 'fiscal') path = \`/api/cnpj/\${clean}/fiscal\`;
+      if (tab === 'dividas') path = \`/api/cnpj/\${clean}/dividas\`;
 
       return { ep: path, full: \`https://cnpj-pro-api.maputo3.workers.dev\${path}\` };
     }

@@ -9,6 +9,7 @@
 
 import { STYLES_CSS, HTML_INDEX, OZPRO_MARK_SVG } from './site-assets.js';
 import { auditarSaudeFiscalCnpj, MOCKS_FISCAIS_CONHECIDOS, SUBLIMITES_SIMPLES_ESTADUAIS } from './saude-fiscal-pgfn.js';
+import { consultarDividasEmpresa, simularNegociacaoDividas, obterAcompanhamentoQuitacao } from './regularizacao-dividas-pro.js';
 
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
@@ -775,6 +776,46 @@ export default {
           razaoSocial: dados.razaoSocial,
           dividaAtivaPgfn: saudeFiscal.dividaAtivaPgfn
         }, null, 2), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json; charset=utf-8', ...CORS_HEADERS }
+        });
+      }
+
+      // ─── Sub-rota: /api/cnpj/:cnpj/dividas (Passivo Fiscal e Inscrições PGFN) ───
+      if (subAction === 'dividas') {
+        const passivo = consultarDividasEmpresa(cnpjClean, dados);
+        return new Response(JSON.stringify({
+          ok: true,
+          ...passivo
+        }, null, 2), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json; charset=utf-8', ...CORS_HEADERS }
+        });
+      }
+
+      // ─── Sub-rota: /api/cnpj/:cnpj/renegociar (Simulador de Negociação & Descontos) ───
+      if (subAction === 'renegociar') {
+        let requestBody = {};
+        if (request.method === 'POST') {
+          try {
+            requestBody = await request.json();
+          } catch (_) {
+            requestBody = {};
+          }
+        }
+        const simulacao = simularNegociacaoDividas(cnpjClean, requestBody, dados);
+        return new Response(JSON.stringify(simulacao, null, 2), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json; charset=utf-8', ...CORS_HEADERS }
+        });
+      }
+
+      // ─── Sub-rota: /api/cnpj/:cnpj/acompanhamento ou /parcelamento (Timeline de Quitação) ───
+      if (subAction === 'acompanhamento' || subAction === 'parcelamento') {
+        const plano = url.searchParams.get('plano') || '12x';
+        const parcelasPagas = parseInt(url.searchParams.get('parcelasPagas') || url.searchParams.get('pagas') || '3', 10);
+        const timeline = obterAcompanhamentoQuitacao(cnpjClean, plano, parcelasPagas);
+        return new Response(JSON.stringify(timeline, null, 2), {
           status: 200,
           headers: { 'Content-Type': 'application/json; charset=utf-8', ...CORS_HEADERS }
         });

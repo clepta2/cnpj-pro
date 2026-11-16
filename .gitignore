@@ -20,3 +20,21 @@ yarn-debug.log*
 yarn-error.log*
 .DS_Store
 Thumbs.db
+
+
+# ==============================================================================
+# PONTE API — BLINDAGEM DE ARQUIVOS SENSÍVEIS (ZERO LEAKS)
+# ==============================================================================
+.env
+.env.*
+!.env.example
+.dev.vars
+*.key
+*.pem
+*.pfx
+*.cert
+*.token
+*.secret
+id_rsa
+firebase-debug.log
+.wrangler/

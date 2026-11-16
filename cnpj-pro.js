@@ -282,6 +282,51 @@
     }
 
     /**
+     * Consulta detalhada de passivos, inscrições ativas e juros/multas consolidadas
+     * @param {string} cnpj
+     * @returns {Promise<Object>}
+     */
+    async consultarDividas(cnpj) {
+      const clean = this.limpar(cnpj);
+      if (!clean || clean.length !== 14) throw new Error('CNPJ inválido.');
+      return this._request(`/api/cnpj/${clean}/dividas`);
+    }
+
+    /**
+     * Simula transação tributária e propostas de quitação com até 70% de desconto
+     * @param {string} cnpj
+     * @param {Object} [options]
+     * @returns {Promise<Object>}
+     */
+    async simularRenegociacao(cnpj, options = {}) {
+      const clean = this.limpar(cnpj);
+      if (!clean || clean.length !== 14) throw new Error('CNPJ inválido.');
+      return this._request(`/api/cnpj/${clean}/renegociar`, {
+        method: 'POST',
+        headers: this._getHeaders(),
+        body: JSON.stringify(options)
+      });
+    }
+
+    /**
+     * Painel de acompanhamento e cronograma de quitação com amortização e status de CPEND
+     * @param {string} cnpj
+     * @param {Object} [options]
+     * @param {string} [options.plano='12x']
+     * @param {number} [options.parcelasPagas=3]
+     * @returns {Promise<Object>}
+     */
+    async obterAcompanhamentoQuitacao(cnpj, options = {}) {
+      const clean = this.limpar(cnpj);
+      if (!clean || clean.length !== 14) throw new Error('CNPJ inválido.');
+      const params = new URLSearchParams();
+      if (options.plano) params.set('plano', options.plano);
+      if (options.parcelasPagas !== undefined) params.set('parcelasPagas', String(options.parcelasPagas));
+      const qs = params.toString() ? `?${params.toString()}` : '';
+      return this._request(`/api/cnpj/${clean}/acompanhamento${qs}`);
+    }
+
+    /**
      * Validação matemática com cálculo de ano de fundação estimado
      * @param {string} cnpj
      * @returns {Promise<Object>}
