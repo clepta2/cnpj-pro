@@ -238,6 +238,50 @@
     }
 
     /**
+     * Auditoria de Saúde Fiscal completa: CND Federal, Dívida Ativa PGFN, Simples Nacional e Score
+     * @param {string} cnpj
+     * @returns {Promise<Object>}
+     */
+    async consultarFiscal(cnpj) {
+      const clean = this.limpar(cnpj);
+      if (!clean || clean.length !== 14) throw new Error('CNPJ inválido.');
+      return this._request(`/api/cnpj/${clean}/fiscal`);
+    }
+
+    /**
+     * Consulta da Certidão Negativa de Débitos Federais e Previdenciários (CND)
+     * @param {string} cnpj
+     * @returns {Promise<Object>}
+     */
+    async consultarCnd(cnpj) {
+      const clean = this.limpar(cnpj);
+      if (!clean || clean.length !== 14) throw new Error('CNPJ inválido.');
+      return this._request(`/api/cnpj/${clean}/cnd`);
+    }
+
+    /**
+     * Consulta detalhada do Simples Nacional, SIMEI e sublimites estaduais
+     * @param {string} cnpj
+     * @returns {Promise<Object>}
+     */
+    async consultarSimples(cnpj) {
+      const clean = this.limpar(cnpj);
+      if (!clean || clean.length !== 14) throw new Error('CNPJ inválido.');
+      return this._request(`/api/cnpj/${clean}/simples`);
+    }
+
+    /**
+     * Consulta indicativa de débitos inscritos em Dívida Ativa da União perante a PGFN
+     * @param {string} cnpj
+     * @returns {Promise<Object>}
+     */
+    async consultarPgfn(cnpj) {
+      const clean = this.limpar(cnpj);
+      if (!clean || clean.length !== 14) throw new Error('CNPJ inválido.');
+      return this._request(`/api/cnpj/${clean}/pgfn`);
+    }
+
+    /**
      * Validação matemática com cálculo de ano de fundação estimado
      * @param {string} cnpj
      * @returns {Promise<Object>}

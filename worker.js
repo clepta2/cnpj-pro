@@ -8,6 +8,7 @@
  */
 
 import { STYLES_CSS, HTML_INDEX, OZPRO_MARK_SVG } from './site-assets.js';
+import { auditarSaudeFiscalCnpj, MOCKS_FISCAIS_CONHECIDOS, SUBLIMITES_SIMPLES_ESTADUAIS } from './saude-fiscal-pgfn.js';
 
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
@@ -224,7 +225,15 @@ function normalizarDadosEmpresa(raw, cnpjClean) {
     endereco,
     contato,
     socios,
-    validacaoEmpresaReal: calcularScoreLegitimidade({ ...raw, endereco, contato, situacaoCadastral: ativa })
+    validacaoEmpresaReal: calcularScoreLegitimidade({ ...raw, endereco, contato, situacaoCadastral: ativa }),
+    saudeFiscal: auditarSaudeFiscalCnpj(cnpjClean, {
+      razaoSocial: raw.razao_social || raw.razaoSocial || raw.nome || '',
+      situacaoCadastral: ativa,
+      capitalSocial: parseFloat(raw.capital_social || raw.capitalSocial || 0),
+      opcaoSimples: Boolean(raw.opcao_pelo_simples ?? raw.opcaoSimples),
+      opcaoMei: Boolean(raw.opcao_pelo_mei ?? raw.opcaoMei),
+      endereco
+    })
   };
 }
 
@@ -711,6 +720,62 @@ export default {
             'Content-Disposition': `attachment; filename="${dados.cnpj}.vcf"`,
             ...CORS_HEADERS
           }
+        });
+      }
+
+      // ─── Sub-rota: /api/cnpj/:cnpj/fiscal (Saúde Fiscal Completa, CND, PGFN e Simples) ───
+      if (subAction === 'fiscal') {
+        return new Response(JSON.stringify({
+          ok: true,
+          cnpj: dados.cnpj,
+          cnpjFormatado: dados.cnpjFormatado,
+          razaoSocial: dados.razaoSocial,
+          saudeFiscal: dados.saudeFiscal
+        }, null, 2), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json; charset=utf-8', ...CORS_HEADERS }
+        });
+      }
+
+      // ─── Sub-rota: /api/cnpj/:cnpj/cnd (Certidão Negativa de Débitos Federal) ───
+      if (subAction === 'cnd') {
+        return new Response(JSON.stringify({
+          ok: true,
+          cnpj: dados.cnpj,
+          cnpjFormatado: dados.cnpjFormatado,
+          razaoSocial: dados.razaoSocial,
+          certidaoNegativaDebitos: dados.saudeFiscal ? dados.saudeFiscal.certidaoNegativaDebitos : null
+        }, null, 2), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json; charset=utf-8', ...CORS_HEADERS }
+        });
+      }
+
+      // ─── Sub-rota: /api/cnpj/:cnpj/simples (Simples Nacional & MEI) ───
+      if (subAction === 'simples') {
+        return new Response(JSON.stringify({
+          ok: true,
+          cnpj: dados.cnpj,
+          cnpjFormatado: dados.cnpjFormatado,
+          razaoSocial: dados.razaoSocial,
+          simplesNacional: dados.saudeFiscal ? dados.saudeFiscal.simplesNacional : null
+        }, null, 2), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json; charset=utf-8', ...CORS_HEADERS }
+        });
+      }
+
+      // ─── Sub-rota: /api/cnpj/:cnpj/pgfn (Dívida Ativa da União) ───
+      if (subAction === 'pgfn' || subAction === 'divida-ativa') {
+        return new Response(JSON.stringify({
+          ok: true,
+          cnpj: dados.cnpj,
+          cnpjFormatado: dados.cnpjFormatado,
+          razaoSocial: dados.razaoSocial,
+          dividaAtivaPgfn: dados.saudeFiscal ? dados.saudeFiscal.dividaAtivaPgfn : null
+        }, null, 2), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json; charset=utf-8', ...CORS_HEADERS }
         });
       }
 

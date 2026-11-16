@@ -1,4 +1,5 @@
 ﻿import fs from 'fs';
+import { MOCKS_FISCAIS_CONHECIDOS, SUBLIMITES_SIMPLES_ESTADUAIS } from './saude-fiscal-pgfn.js';
 
 const html = `<!DOCTYPE html>
 <html lang="pt-BR">
@@ -262,6 +263,9 @@ const html = `<!DOCTYPE html>
         <button class="nav-link" data-view="contato">
           <i data-lucide="phone"></i> <span>Contato & B2B Lead</span>
         </button>
+        <button class="nav-link" data-view="fiscal">
+          <i data-lucide="shield-check"></i> <span>Saúde Fiscal & CND</span>
+        </button>
         <button class="nav-link" data-view="docs">
           <i data-lucide="book-open"></i> <span>Documentação REST</span>
         </button>
@@ -369,6 +373,9 @@ const html = `<!DOCTYPE html>
           </button>
           <button class="tab-nav-btn" data-tab="contato">
             <i data-lucide="phone"></i> <span>Contato B2B & Leads</span>
+          </button>
+          <button class="tab-nav-btn" data-tab="fiscal">
+            <i data-lucide="shield-check"></i> <span>Saúde Fiscal & CND</span>
           </button>
         </div>
 
@@ -482,6 +489,74 @@ const html = `<!DOCTYPE html>
                 <div id="contato-container" style="display:grid;gap:12px;"></div>
               </div>
             </div>
+
+            <!-- TAB 4: SAÚDE FISCAL & CND -->
+            <div id="section-fiscal" class="tab-pane" style="display:none;">
+              <div class="card-dashboard">
+                <div style="font-size:14px;font-weight:700;color:var(--ink);margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;">
+                  <span style="display:flex;align-items:center;gap:8px;">
+                    <i data-lucide="shield-check" style="color:var(--blue);"></i>
+                    <span>Auditoria de Saúde Fiscal, CND & Dívida Ativa PGFN</span>
+                  </span>
+                  <span id="fiscal-cnd-badge" class="status-badge-pill green">CND Negativa</span>
+                </div>
+                <p style="font-size:12.5px;color:var(--muted);margin-bottom:16px;line-height:1.5;">
+                  Diagnóstico completo de idoneidade fiscal, inscrição em Dívida Ativa da União, aptidão para licitações e enquadramento no Simples Nacional:
+                </p>
+
+                <!-- Cards de Indicadores Fiscais -->
+                <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:10px;margin-bottom:16px;">
+                  <div style="padding:12px;border-radius:var(--radius-md);background:var(--paper-elevated,#111827);border:1px solid var(--line);">
+                    <div style="font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;">Certidão CND Federal</div>
+                    <div id="fiscal-cnd-tipo" style="font-size:13px;font-weight:800;color:var(--ink);margin:3px 0;">Certidão Negativa Plena</div>
+                    <div id="fiscal-cnd-obs" style="font-size:10.5px;color:#10b981;">Apta para Licitações e Crédito</div>
+                  </div>
+                  <div style="padding:12px;border-radius:var(--radius-md);background:var(--paper-elevated,#111827);border:1px solid var(--line);">
+                    <div style="font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;">Dívida Ativa PGFN</div>
+                    <div id="fiscal-pgfn-status" style="font-size:13px;font-weight:800;color:#10b981;margin:3px 0;">Nada Consta</div>
+                    <div id="fiscal-pgfn-valor" style="font-size:10.5px;color:var(--muted);">Valor Inscrito: R$ 0,00</div>
+                  </div>
+                  <div style="padding:12px;border-radius:var(--radius-md);background:var(--paper-elevated,#111827);border:1px solid var(--line);">
+                    <div style="font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;">Regime Tributário</div>
+                    <div id="fiscal-simples-regime" style="font-size:13px;font-weight:800;color:var(--ink);margin:3px 0;">Simples Nacional</div>
+                    <div id="fiscal-simples-sublimite" style="font-size:10.5px;color:var(--muted);">Sublimite: R$ 4.800.000,00</div>
+                  </div>
+                  <div style="padding:12px;border-radius:var(--radius-md);background:var(--paper-elevated,#111827);border:1px solid var(--line);">
+                    <div style="font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;">Rating de Solvência Fiscal</div>
+                    <div id="fiscal-score-val" style="font-size:13px;font-weight:900;color:#10b981;margin:3px 0;">Score 980 / 1000 (Triple A)</div>
+                    <div id="fiscal-score-recom" style="font-size:10.5px;color:var(--muted);">Risco de Inadimplência: 0.1%</div>
+                  </div>
+                </div>
+
+                <!-- Detalhes Legais e Parecer -->
+                <div style="border:1px solid var(--line);border-radius:var(--radius-lg);overflow:hidden;background:var(--paper);">
+                  <div style="padding:12px 16px;background:var(--paper-elevated,#162032);border-bottom:1px solid var(--line);font-size:13px;font-weight:700;color:var(--ink);display:flex;align-items:center;gap:7px;">
+                    <i data-lucide="clipboard-check"></i>
+                    <span>Parecer Fiscal & Auditoria Tributária</span>
+                  </div>
+                  <table class="specs-table">
+                    <tbody>
+                      <tr>
+                        <td class="label-col">Situação Fazenda Nacional</td>
+                        <td class="val-col" id="val-fiscal-situacao"><span class="status-badge-pill green">REGULAR PLENA</span></td>
+                      </tr>
+                      <tr>
+                        <td class="label-col">Número da Certidão</td>
+                        <td class="val-col" id="val-fiscal-certidao" style="font-family:'JetBrains Mono',monospace;">RFB-PGFN-2026/0019283-DF</td>
+                      </tr>
+                      <tr>
+                        <td class="label-col">Validade da CND</td>
+                        <td class="val-col" id="val-fiscal-validade">180 dias corridos</td>
+                      </tr>
+                      <tr>
+                        <td class="label-col">Habilitação Jurídico-Fiscal</td>
+                        <td class="val-col" id="val-fiscal-habilitacao" style="color:#10b981;font-weight:700;">Habilitada para contratar com o Poder Público</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
           </div>
 
           <!-- Coluna 2: Terminal Console Dark Oficial da Ponte API -->
@@ -538,6 +613,7 @@ const html = `<!DOCTYPE html>
 
   <!-- Script da Aplicação e Integração -->
   <script type="module">
+    const MOCKS_FISCAIS_CLIENT = ${JSON.stringify(MOCKS_FISCAIS_CONHECIDOS)};
 
     // Controle do Menu Lateral Mobile (Drawer)
     function setupMobileNav() {
@@ -616,6 +692,7 @@ const html = `<!DOCTYPE html>
           consulta: 'Consulta Cadastral',
           socios: 'Quadro Societário (QSA)',
           contato: 'Contato & B2B Lead',
+          fiscal: 'Saúde Fiscal & CND',
           docs: 'Documentação REST'
         };
         if (bread && titles[tabKey]) bread.textContent = titles[tabKey];
@@ -645,6 +722,7 @@ const html = `<!DOCTYPE html>
       let path = \`/api/cnpj/\${clean}/resumo\`;
       if (tab === 'socios') path = \`/api/cnpj/\${clean}/socios\`;
       if (tab === 'contato') path = \`/api/cnpj/\${clean}/contato\`;
+      if (tab === 'fiscal') path = \`/api/cnpj/\${clean}/fiscal\`;
 
       return { ep: path, full: \`https://cnpj-pro-api.maputo3.workers.dev\${path}\` };
     }
@@ -729,12 +807,71 @@ const html = `<!DOCTYPE html>
           const contatoBox = document.getElementById('contato-container');
           contatoBox.innerHTML = \`
             <div style="padding:14px;border-radius:var(--radius-md);background:var(--paper-elevated,#f8fafc);border:1px solid var(--line);font-size:13px;">
-              <strong>Telefone:</strong> \${data.telefone || data.ddd_telefone_1 || '(11) Não divulgado')}<br>
+              <strong>Telefone:</strong> \${data.telefone || data.ddd_telefone_1 || '(11) Não divulgado'}<br>
               <strong>E-mail:</strong> \${data.email || 'Não informado'}<br>
               <strong>Logradouro:</strong> \${data.logradouro || ''}, \${data.numero || ''} \${data.complemento || ''}<br>
               <strong>Bairro:</strong> \${data.bairro || ''} — CEP: \${data.cep || ''}
             </div>
           \`;
+
+          // Preenche Saúde Fiscal & CND
+          const fiscal = data.saudeFiscal || MOCKS_FISCAIS_CLIENT[clean] || MOCKS_FISCAIS_CLIENT['00000000000191'];
+          if (fiscal) {
+            const cndBadge = document.getElementById('fiscal-cnd-badge');
+            if (cndBadge && fiscal.certidaoNegativaDebitos) {
+              const ok = fiscal.certidaoNegativaDebitos.status.includes('NEGATIVA') || fiscal.certidaoNegativaDebitos.status.includes('GARANTIA');
+              cndBadge.className = 'status-badge-pill ' + (ok ? 'green' : 'red');
+              cndBadge.textContent = ok ? 'CND Negativa' : 'CND com Restrições';
+            }
+
+            const cndTipo = document.getElementById('fiscal-cnd-tipo');
+            if (cndTipo && fiscal.certidaoNegativaDebitos) cndTipo.textContent = fiscal.certidaoNegativaDebitos.tipo;
+
+            const cndObs = document.getElementById('fiscal-cnd-obs');
+            if (cndObs && fiscal.certidaoNegativaDebitos) cndObs.textContent = fiscal.certidaoNegativaDebitos.observacao;
+
+            const pgfnStat = document.getElementById('fiscal-pgfn-status');
+            if (pgfnStat && fiscal.dividaAtivaPgfn) {
+              pgfnStat.textContent = fiscal.dividaAtivaPgfn.possuiInscricaoPgfn ? 'Inscrição Ativa' : 'Nada Consta';
+              pgfnStat.style.color = fiscal.dividaAtivaPgfn.possuiInscricaoPgfn ? '#ef4444' : '#10b981';
+            }
+
+            const pgfnVal = document.getElementById('fiscal-pgfn-valor');
+            if (pgfnVal && fiscal.dividaAtivaPgfn) {
+              pgfnVal.textContent = 'Valor Inscrito: R$ ' + (fiscal.dividaAtivaPgfn.valorTotalInscrito || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+            }
+
+            const simpReg = document.getElementById('fiscal-simples-regime');
+            if (simpReg && fiscal.simplesNacional) simpReg.textContent = fiscal.simplesNacional.regimeTributario || (fiscal.simplesNacional.optanteSimples ? 'Simples Nacional' : 'Lucro Presumido / Real');
+
+            const simpSub = document.getElementById('fiscal-simples-sublimite');
+            if (simpSub && fiscal.simplesNacional) simpSub.textContent = 'Sublimite: ' + (fiscal.simplesNacional.sublimiteEstadual || fiscal.simplesNacional.sublimiteIcmsIssSp || 'R$ 3.600.000,00');
+
+            const scoreVal = document.getElementById('fiscal-score-val');
+            if (scoreVal && fiscal.saudeFiscalScore) {
+              scoreVal.textContent = 'Score ' + fiscal.saudeFiscalScore.score + ' / 1000 (' + fiscal.saudeFiscalScore.classificacao + ')';
+              scoreVal.style.color = fiscal.saudeFiscalScore.score >= 700 ? '#10b981' : '#f59e0b';
+            }
+
+            const scoreRec = document.getElementById('fiscal-score-recom');
+            if (scoreRec && fiscal.saudeFiscalScore) {
+              scoreRec.textContent = 'Recomendação: ' + fiscal.saudeFiscalScore.recomendacaoCredito;
+            }
+
+            const valSit = document.getElementById('val-fiscal-situacao');
+            if (valSit) {
+              valSit.innerHTML = '<span class="status-badge-pill green">' + (fiscal.situacaoFiscal || 'REGULAR') + '</span>';
+            }
+
+            const valCert = document.getElementById('val-fiscal-certidao');
+            if (valCert && fiscal.certidaoNegativaDebitos) valCert.textContent = fiscal.certidaoNegativaDebitos.numeroCertidao || 'RFB-PGFN-2026/0019283';
+
+            const valHab = document.getElementById('val-fiscal-habilitacao');
+            if (valHab && fiscal.certidaoNegativaDebitos) {
+              valHab.textContent = fiscal.certidaoNegativaDebitos.aptaParaLicitacoes ? 'Habilitada para contratar com o Poder Público' : 'Impedida de licitar';
+              valHab.style.color = fiscal.certidaoNegativaDebitos.aptaParaLicitacoes ? '#10b981' : '#ef4444';
+            }
+          }
         }
       } catch (err) {
         consoleOutput.textContent = \`Erro: \${err.message}\`;
@@ -773,6 +910,9 @@ const html = `<!DOCTYPE html>
       </button>
       <button class="mobile-nav-item " data-tab="contato">
         <i data-lucide="phone"></i><span>Contato</span>
+      </button>
+      <button class="mobile-nav-item " data-tab="fiscal">
+        <i data-lucide="shield-check"></i><span>Fiscal/CND</span>
       </button>
       <button class="mobile-nav-item " data-tab="docs">
         <i data-lucide="book-open"></i><span>Docs</span>
