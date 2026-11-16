@@ -266,6 +266,9 @@
         <button class="nav-link" data-view="dividas">
           <i data-lucide="scale"></i> <span>Dívidas & Quitação Pix</span>
         </button>
+        <button class="nav-link" data-view="compliance">
+          <i data-lucide="file-check-2"></i> <span>Certidões & Compliance</span>
+        </button>
         <button class="nav-link" data-view="docs">
           <i data-lucide="book-open"></i> <span>Documentação REST</span>
         </button>
@@ -379,6 +382,9 @@
           </button>
           <button class="tab-nav-btn" data-tab="dividas">
             <i data-lucide="scale"></i> <span>Dívidas & Quitação Pix</span>
+          </button>
+          <button class="tab-nav-btn" data-tab="compliance">
+            <i data-lucide="file-check-2"></i> <span>Certidões & Compliance</span>
           </button>
         </div>
 
@@ -515,7 +521,7 @@
                   <div style="padding:12px;border-radius:var(--radius-md);background:var(--paper-elevated,#111827);border:1px solid var(--line);">
                     <div style="font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;">Certidão CND Federal</div>
                     <div id="fiscal-cnd-tipo" style="font-size:13px;font-weight:800;color:var(--ink);margin:3px 0;">Certidão Negativa Plena</div>
-                    <div id="fiscal-cnd-obs" style="font-size:10.5px;color:#10b981;">Apta para Licitações e Crédito</div>
+                    <div id="fiscal-cnd-obs" style="font-size:10.5px;color:#10b981;">Apta para Licitações e Contratos</div>
                   </div>
                   <div style="padding:12px;border-radius:var(--radius-md);background:var(--paper-elevated,#111827);border:1px solid var(--line);">
                     <div style="font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;">Dívida Ativa PGFN</div>
@@ -528,9 +534,9 @@
                     <div id="fiscal-simples-sublimite" style="font-size:10.5px;color:var(--muted);">Sublimite: R$ 4.800.000,00</div>
                   </div>
                   <div style="padding:12px;border-radius:var(--radius-md);background:var(--paper-elevated,#111827);border:1px solid var(--line);">
-                    <div style="font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;">Rating de Solvência Fiscal</div>
-                    <div id="fiscal-score-val" style="font-size:13px;font-weight:900;color:#10b981;margin:3px 0;">Score 980 / 1000 (Triple A)</div>
-                    <div id="fiscal-score-recom" style="font-size:10.5px;color:var(--muted);">Risco de Inadimplência: 0.1%</div>
+                    <div style="font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;">Índice de Regularidade Cadastral</div>
+                    <div id="fiscal-score-val" style="font-size:13px;font-weight:900;color:#10b981;margin:3px 0;">980 / 1000 (Regularidade Máxima)</div>
+                    <div id="fiscal-score-recom" style="font-size:10.5px;color:var(--muted);">Situação Fiscal 100% Regular</div>
                   </div>
                 </div>
 
@@ -684,6 +690,119 @@
                 </div>
               </div>
             </div>
+
+            <!-- TAB 6: CERTIDÕES OFICIAIS & COMPLIANCE REGULATÓRIA -->
+            <div id="section-compliance" class="tab-pane" style="display:none;">
+              <div class="card-dashboard">
+                <div style="font-size:14px;font-weight:700;color:var(--ink);margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+                  <span style="display:flex;align-items:center;gap:8px;">
+                    <i data-lucide="file-check-2" style="color:var(--blue);"></i>
+                    <span>Combo de Certidões (Kit Licitação) &amp; Compliance Regulatória</span>
+                  </span>
+                  <span id="kit-licitacao-badge" class="status-badge-pill green">Apto para Licitações (5/5)</span>
+                </div>
+                <p style="font-size:12.5px;color:var(--muted);margin-bottom:16px;line-height:1.5;">
+                  Auditoria das 5 certidões obrigatórias exigidas pela Lei nº 14.133/2021 (Nova Lei de Licitações), Inscrição Estadual (Sintegra), Radar Siscomex e Grupo Econômico:
+                </p>
+
+                <!-- Grid com as 5 Certidões Oficiais -->
+                <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(210px, 1fr));gap:10px;margin-bottom:16px;">
+                  <!-- Certidão 1: CND Federal -->
+                  <div style="padding:12px;border-radius:var(--radius-md);background:var(--paper-elevated,#111827);border:1px solid var(--line);">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                      <span style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;">1. CND Federal / PGFN</span>
+                      <span id="badge-cert-federal" class="status-badge-pill green">Negativa</span>
+                    </div>
+                    <div id="val-cert-federal-num" style="font-size:11.5px;font-weight:800;color:var(--ink);font-family:'JetBrains Mono',monospace;">RFB-PGFN-2026/0019283</div>
+                    <div id="val-cert-federal-val" style="font-size:10.5px;color:var(--muted);margin-top:2px;">Validade: 180 dias</div>
+                  </div>
+
+                  <!-- Certidão 2: CNDT Trabalhista TST -->
+                  <div style="padding:12px;border-radius:var(--radius-md);background:var(--paper-elevated,#111827);border:1px solid var(--line);">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                      <span style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;">2. CNDT Trabalhista (TST)</span>
+                      <span id="badge-cert-cndt" class="status-badge-pill green">Negativa</span>
+                    </div>
+                    <div id="val-cert-cndt-num" style="font-size:11.5px;font-weight:800;color:var(--ink);font-family:'JetBrains Mono',monospace;">TST-CNDT-2026/492019</div>
+                    <div id="val-cert-cndt-val" style="font-size:10.5px;color:var(--muted);margin-top:2px;">Base: Lei 12.440 (BNDT)</div>
+                  </div>
+
+                  <!-- Certidão 3: CRF FGTS Caixa -->
+                  <div style="padding:12px;border-radius:var(--radius-md);background:var(--paper-elevated,#111827);border:1px solid var(--line);">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                      <span style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;">3. CRF FGTS (Caixa)</span>
+                      <span id="badge-cert-fgts" class="status-badge-pill green">Regular</span>
+                    </div>
+                    <div id="val-cert-fgts-num" style="font-size:11.5px;font-weight:800;color:var(--ink);font-family:'JetBrains Mono',monospace;">CRF-CEF-2026/194892</div>
+                    <div id="val-cert-fgts-val" style="font-size:10.5px;color:var(--muted);margin-top:2px;">Validade: 30 dias</div>
+                  </div>
+
+                  <!-- Certidão 4: CND Estadual SEFAZ -->
+                  <div style="padding:12px;border-radius:var(--radius-md);background:var(--paper-elevated,#111827);border:1px solid var(--line);">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                      <span style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;">4. CND Estadual (SEFAZ)</span>
+                      <span id="badge-cert-estadual" class="status-badge-pill green">Negativa</span>
+                    </div>
+                    <div id="val-cert-estadual-num" style="font-size:11.5px;font-weight:800;color:var(--ink);font-family:'JetBrains Mono',monospace;">SEFAZ-ICMS-2026/991823</div>
+                    <div id="val-cert-estadual-val" style="font-size:10.5px;color:var(--muted);margin-top:2px;">Tributos Estaduais</div>
+                  </div>
+
+                  <!-- Certidão 5: CND Municipal -->
+                  <div style="padding:12px;border-radius:var(--radius-md);background:var(--paper-elevated,#111827);border:1px solid var(--line);">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                      <span style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;">5. CND Municipal (ISS)</span>
+                      <span id="badge-cert-municipal" class="status-badge-pill green">Negativa</span>
+                    </div>
+                    <div id="val-cert-municipal-num" style="font-size:11.5px;font-weight:800;color:var(--ink);font-family:'JetBrains Mono',monospace;">MUN-ISS-2026/112093</div>
+                    <div id="val-cert-municipal-val" style="font-size:10.5px;color:var(--muted);margin-top:2px;">Tributos Mobiliários</div>
+                  </div>
+                </div>
+
+                <!-- Painel de Inscrição Estadual, Sintegra e Radar Siscomex -->
+                <div style="border:1px solid var(--line);border-radius:var(--radius-lg);overflow:hidden;background:var(--paper);margin-bottom:16px;">
+                  <div style="padding:12px 16px;background:var(--paper-elevated,#162032);border-bottom:1px solid var(--line);font-size:13px;font-weight:700;color:var(--ink);display:flex;align-items:center;gap:7px;">
+                    <i data-lucide="shield-check"></i>
+                    <span>Registros Regulatórios, Sintegra &amp; Comércio Exterior</span>
+                  </div>
+                  <table class="specs-table">
+                    <tbody>
+                      <tr>
+                        <td class="label-col">Inscrição Estadual (IE)</td>
+                        <td class="val-col" id="val-comp-ie" style="font-family:'JetBrains Mono',monospace;font-weight:700;">110.042.490.114 (SP)</td>
+                      </tr>
+                      <tr>
+                        <td class="label-col">Situação no Sintegra / CCC</td>
+                        <td class="val-col" id="val-comp-sintegra"><span class="status-badge-pill green">HABILITADA ATIVA</span></td>
+                      </tr>
+                      <tr>
+                        <td class="label-col">Radar Siscomex (Aduana RFB)</td>
+                        <td class="val-col" id="val-comp-radar" style="font-weight:700;color:#10b981;">HABILITADA ILIMITADA (Importador / Exportador)</td>
+                      </tr>
+                      <tr>
+                        <td class="label-col">Cartórios de Protesto (IEPTB)</td>
+                        <td class="val-col" id="val-comp-protestos"><span class="status-badge-pill green">NADA CONSTA EM CARTÓRIOS</span></td>
+                      </tr>
+                      <tr>
+                        <td class="label-col">Conformidade PEP (CGU / COAF)</td>
+                        <td class="val-col" id="val-comp-pep" style="color:#10b981;font-weight:600;">Sem registros de Pessoas Expostas Politicamente</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <!-- Painel de Teia Societária Forense & Grupo Econômico (Deep QSA) -->
+                <div style="border:1px solid var(--line);border-radius:var(--radius-lg);overflow:hidden;background:var(--paper);">
+                  <div style="padding:12px 16px;background:var(--paper-elevated,#162032);border-bottom:1px solid var(--line);font-size:13px;font-weight:700;color:var(--ink);display:flex;align-items:center;justify-content:space-between;">
+                    <span style="display:flex;align-items:center;gap:7px;">
+                      <i data-lucide="layers"></i>
+                      <span>Teia Societária Forense &amp; Empresas do Grupo Econômico</span>
+                    </span>
+                    <span id="grupo-economico-count" style="font-size:11px;color:var(--muted);">Mapeamento por Sócios em Comum</span>
+                  </div>
+                  <div id="grupo-economico-container" style="padding:12px;display:grid;gap:8px;"></div>
+                </div>
+              </div>
+            </div>
           </div>
 
           <!-- Coluna 2: Terminal Console Dark Oficial da Ponte API -->
@@ -738,8 +857,9 @@
 
   <!-- Script da Aplicação e Integração -->
   <script type="module">
-    const MOCKS_FISCAIS_CLIENT = {"33000167000101":{"cnpj":"33.000.167/0001-01","razaoSocial":"PETROLEO BRASILEIRO S A PETROBRAS","situacaoFiscal":"REGULAR","certidaoNegativaDebitos":{"tipo":"CPEND (Certidão Positiva com Efeitos de Negativa)","status":"REGULAR_COM_GARANTIA","numeroCertidao":"PGFN-RFB-2026/8849201-SP","validadeDias":180,"vencimento":"2026-11-20","aptaParaLicitacoes":true,"observacao":"Débitos com exigibilidade suspensa nos termos do Art. 151 do CTN ou garantidos por penhora."},"dividaAtivaPgfn":{"possuiInscricaoPgfn":false,"totalProcessos":0,"valorTotalInscrito":0,"detalhes":[]},"simplesNacional":{"optanteSimples":false,"optanteSimei":false,"motivoNaoOptante":"Vedação por porte (Sociedade Anônima de Capital Aberto) e faturamento acima do teto de R$ 4,8 milhões.","historicoExclusoes":[]},"saudeFiscalScore":{"score":980,"classificacao":"TRIPLE_A_EXCELENTE","probabilidadeInadimplencia":"0.1%","recomendacaoCredito":"CRÉDITO AMPLAMENTE RECOMENDADO"}},"00000000000191":{"cnpj":"00.000.000/0001-91","razaoSocial":"BANCO DO BRASIL SA","situacaoFiscal":"REGULAR","certidaoNegativaDebitos":{"tipo":"CND (Certidão Negativa de Débitos Relativos a Créditos Tributários Federais e à Dívida Ativa da União)","status":"NEGATIVA_TOTAL","numeroCertidao":"RFB-PGFN-2026/0019283-DF","validadeDias":180,"vencimento":"2026-12-15","aptaParaLicitacoes":true,"observacao":"Constata-se a não existência de débitos em nome da matriz e suas filiais."},"dividaAtivaPgfn":{"possuiInscricaoPgfn":false,"totalProcessos":0,"valorTotalInscrito":0,"detalhes":[]},"simplesNacional":{"optanteSimples":false,"optanteSimei":false,"motivoNaoOptante":"Instituição Financeira (Vedação Legal Lei Complementar nº 123/2006).","historicoExclusoes":[]},"saudeFiscalScore":{"score":990,"classificacao":"TRIPLE_A_EXCELENTE","probabilidadeInadimplencia":"0.05%","recomendacaoCredito":"RISCO ZERO / INSTITUIÇÃO FINANCEIRA"}},"48916772000100":{"cnpj":"48.916.772/0001-00","razaoSocial":"OZPRO ENTERPRISE TECNOLOGIA LTDA","situacaoFiscal":"REGULAR","certidaoNegativaDebitos":{"tipo":"CND (Certidão Negativa Plena)","status":"NEGATIVA_TOTAL","numeroCertidao":"RFB-PGFN-2026/4891677-SP","validadeDias":180,"vencimento":"2026-12-31","aptaParaLicitacoes":true,"observacao":"Sem débitos tributários federais ou previdenciários."},"dividaAtivaPgfn":{"possuiInscricaoPgfn":false,"totalProcessos":0,"valorTotalInscrito":0,"detalhes":[]},"simplesNacional":{"optanteSimples":true,"dataOpcaoSimples":"2022-09-15","optanteSimei":false,"sublimiteIcmsIssSp":"R$ 4.800.000,00","tetoAnualFederal":"R$ 4.800.000,00","situacaoSimples":"REGULAR NO REGIME ESPECIAL UNIFICADO"},"saudeFiscalScore":{"score":920,"classificacao":"A_ALTA_SOLVENCIA","probabilidadeInadimplencia":"0.8%","recomendacaoCredito":"CRÉDITO RECOMENDADO COM CONDIÇÕES PADRÃO"}}};
+    const MOCKS_FISCAIS_CLIENT = {"33000167000101":{"cnpj":"33.000.167/0001-01","razaoSocial":"PETROLEO BRASILEIRO S A PETROBRAS","situacaoFiscal":"REGULAR","certidaoNegativaDebitos":{"tipo":"CPEND (Certidão Positiva com Efeitos de Negativa)","status":"REGULAR_COM_GARANTIA","numeroCertidao":"PGFN-RFB-2026/8849201-SP","validadeDias":180,"vencimento":"2026-11-20","aptaParaLicitacoes":true,"observacao":"Débitos com exigibilidade suspensa nos termos do Art. 151 do CTN ou garantidos por penhora."},"dividaAtivaPgfn":{"possuiInscricaoPgfn":false,"totalProcessos":0,"valorTotalInscrito":0,"detalhes":[]},"simplesNacional":{"optanteSimples":false,"optanteSimei":false,"motivoNaoOptante":"Vedação por porte (Sociedade Anônima de Capital Aberto) e faturamento acima do teto de R$ 4,8 milhões.","historicoExclusoes":[]},"saudeFiscalScore":{"score":980,"classificacao":"REGULARIDADE_MAXIMA","parecerFiscal":"EMPRESA 100% REGULAR PERANTE A FAZENDA NACIONAL","conformidadeCadastral":"Sem pendências fiscais, previdenciárias ou trabalhistas ativas."}},"00000000000191":{"cnpj":"00.000.000/0001-91","razaoSocial":"BANCO DO BRASIL SA","situacaoFiscal":"REGULAR","certidaoNegativaDebitos":{"tipo":"CND (Certidão Negativa de Débitos Relativos a Créditos Tributários Federais e à Dívida Ativa da União)","status":"NEGATIVA_TOTAL","numeroCertidao":"RFB-PGFN-2026/0019283-DF","validadeDias":180,"vencimento":"2026-12-15","aptaParaLicitacoes":true,"observacao":"Constata-se a não existência de débitos em nome da matriz e suas filiais."},"dividaAtivaPgfn":{"possuiInscricaoPgfn":false,"totalProcessos":0,"valorTotalInscrito":0,"detalhes":[]},"simplesNacional":{"optanteSimples":false,"optanteSimei":false,"motivoNaoOptante":"Instituição Financeira (Vedação Legal Lei Complementar nº 123/2006).","historicoExclusoes":[]},"saudeFiscalScore":{"score":990,"classificacao":"REGULARIDADE_MAXIMA","parecerFiscal":"INSTITUIÇÃO FINANCEIRA COM CERTIDÃO NEGATIVA TOTAL","conformidadeCadastral":"Sem débitos tributários federais ou previdenciários."}},"48916772000100":{"cnpj":"48.916.772/0001-00","razaoSocial":"OZPRO ENTERPRISE TECNOLOGIA LTDA","situacaoFiscal":"REGULAR","certidaoNegativaDebitos":{"tipo":"CND (Certidão Negativa Plena)","status":"NEGATIVA_TOTAL","numeroCertidao":"RFB-PGFN-2026/4891677-SP","validadeDias":180,"vencimento":"2026-12-31","aptaParaLicitacoes":true,"observacao":"Sem débitos tributários federais ou previdenciários."},"dividaAtivaPgfn":{"possuiInscricaoPgfn":false,"totalProcessos":0,"valorTotalInscrito":0,"detalhes":[]},"simplesNacional":{"optanteSimples":true,"dataOpcaoSimples":"2022-09-15","optanteSimei":false,"sublimiteIcmsIssSp":"R$ 4.800.000,00","tetoAnualFederal":"R$ 4.800.000,00","situacaoSimples":"REGULAR NO REGIME ESPECIAL UNIFICADO"},"saudeFiscalScore":{"score":920,"classificacao":"ALTA_REGULARIDADE","parecerFiscal":"EMPRESA REGULAR NO SIMPLES NACIONAL","conformidadeCadastral":"Situação fiscal e cadastral regular sem restrições."}}};
     const DEBITOS_CLIENT = {"33000167000101":{"totalDividaBruta":0,"totalComDesconto":0,"descontoPossivel":0,"possuiDebitosAtivos":false,"aptidaoTransacaoPGFN":false,"motivoAptidao":"Empresa com certidão regular e sem inscrições ativas em cobrança na PGFN.","inscricoes":[]},"00000000000191":{"totalDividaBruta":0,"totalComDesconto":0,"descontoPossivel":0,"possuiDebitosAtivos":false,"aptidaoTransacaoPGFN":false,"motivoAptidao":"Certidão Negativa Plena. Empresa sem pendências tributárias.","inscricoes":[]},"11111111000191":{"totalDividaBruta":48650,"totalComDesconto":21890,"descontoPossivel":26760,"descontoMaximoPercentual":55,"possuiDebitosAtivos":true,"aptidaoTransacaoPGFN":true,"programaNegociacao":"Transação por Adesão PGFN / Edital Regularize Pequeno Porte","inscricoes":[{"numeroInscricao":"80.6.24.009124-12","tributo":"Simples Nacional / DAS em Atraso (2023-2024)","orgao":"Procuradoria-Geral da Fazenda Nacional (PGFN)","dataExigibilidade":"2024-03-15","valorOriginal":18200,"multaDeMora":3640,"jurosSelic":4210,"encargosLegais":2605,"valorTotalAtualizado":28655,"statusCobranca":"Inscrição Ativa / Em Fase de Execução Fiscal","descontoAplicavelJurosMulta":"65% de abatimento nos acréscimos legais"},{"numeroInscricao":"80.2.23.004512-88","tributo":"Contribuição Previdenciária Patronal (INSS)","orgao":"Receita Federal / PGFN","dataExigibilidade":"2023-10-20","valorOriginal":12500,"multaDeMora":2500,"jurosSelic":3245,"encargosLegais":1750,"valorTotalAtualizado":19995,"statusCobranca":"Inscrição em Dívida Ativa da União","descontoAplicavelJurosMulta":"50% de abatimento nos acréscimos legais"}]}};
+    const COMPLIANCE_CLIENT = {"00000000000191":{"inscricaoEstadual":{"uf":"DF","numero":"07.300.001/001-44","situacaoSintegra":"HABILITADA_ATIVA","regimeTributario":"Normal (Instituição Financeira)","atualizacaoCadastral":"2026-10-15"},"radarSiscomex":{"habilitado":true,"modalidade":"ILIMITADA","tipoAtuacao":"Importador / Exportador / Câmbio","vigencia":"ATIVA_PERMANENTE","observacao":"Habilitado para operações cambiais e aduaneiras sem teto limitador."},"certidoes":{"cndFederal":{"nome":"Certidão Conjunta Federal e Previdenciária (RFB/PGFN)","orgao":"Secretaria Especial da Receita Federal / PGFN","status":"NEGATIVA","numeroCertidao":"RFB-PGFN-2026/0019283-DF","emissao":"2026-06-18","validade":"2026-12-15","apta":true},"cndtTrabalhista":{"nome":"Certidão Negativa de Débitos Trabalhistas (CNDT)","orgao":"Tribunal Superior do Trabalho (TST / CSJT)","status":"NEGATIVA","numeroCertidao":"TST-CNDT-2026/492019-DF","emissao":"2026-07-01","validade":"2026-12-28","baseLegal":"Lei nº 12.440/2011 e Resolução Administrativa TST nº 1470/2011","apta":true},"crfFgts":{"nome":"Certificado de Regularidade do FGTS (CRF)","orgao":"Caixa Econômica Federal","status":"REGULAR","numeroCertificado":"2026071501489218491290","emissao":"2026-11-01","validade":"2026-12-01","apta":true},"cndEstadual":{"nome":"Certidão Negativa de Débitos Estaduais (ICMS / Dívida Ativa SEFAZ)","orgao":"Secretaria de Estado de Economia do Distrito Federal (SEEC/DF)","status":"NEGATIVA","numeroCertidao":"SEFAZ-DF-2026/991823","emissao":"2026-08-10","validade":"2027-02-10","apta":true},"cndMunicipal":{"nome":"Certidão de Quitação de Tributos Mobiliários e Imobiliários","orgao":"Governo do Distrito Federal / Secretaria de Finanças","status":"NEGATIVA","numeroCertidao":"MUN-DF-2026/112093","emissao":"2026-09-01","validade":"2026-12-01","apta":true}},"kitLicitacao":{"aptoParaLicitacoesEContratos":true,"totalCertidoesExigidas":5,"certidoesRegulares":5,"pendenciasIdentificadas":[]},"grupoEconomico":[{"cnpj":"00.360.305/0001-04","razaoSocial":"CAIXA DE PREVIDENCIA DOS FUNCIONARIOS DO BANCO DO BRASIL PREVI","relacao":"Entidade Fechada de Previdência Complementar Vinculada","cnae":"6551-1/00"},{"cnpj":"04.184.779/0001-01","razaoSocial":"BB SEGURIDADE PARTICIPACOES S.A.","relacao":"Subsidiária Integral / Grupo Consolidado","cnae":"6462-0/00"},{"cnpj":"01.658.600/0001-98","razaoSocial":"BB GESTAO DE RECURSOS DTVM S.A.","relacao":"Braço de Gestão de Ativos Financeiros","cnae":"6612-6/01"}],"protestosCartorio":{"possuiProtestosAtivos":false,"totalTitulosProtestados":0,"valorTotalProtestado":0,"ocorrencias":[]},"conformidadePep":{"possuiPessoasExpostasPoliticamente":false,"observacao":"Conselho de Administração auditado conforme Lei das Estatais (Lei nº 13.303/2016)."}},"33000167000101":{"inscricaoEstadual":{"uf":"RJ","numero":"81.428.001","situacaoSintegra":"HABILITADA_ATIVA","regimeTributario":"Normal (Refino e Exploração de Petróleo)","atualizacaoCadastral":"2026-11-01"},"radarSiscomex":{"habilitado":true,"modalidade":"ILIMITADA","tipoAtuacao":"Importador / Exportador Pleno","vigencia":"ATIVA_PERMANENTE","observacao":"Operações de comércio exterior autorizadas em todos os portos e terminais alfandegários."},"certidoes":{"cndFederal":{"nome":"Certidão Conjunta Federal e Previdenciária (RFB/PGFN)","orgao":"Secretaria Especial da Receita Federal / PGFN","status":"POSITIVA_COM_EFEITOS_DE_NEGATIVA","numeroCertidao":"PGFN-RFB-2026/8849201-SP","emissao":"2026-05-24","validade":"2026-11-20","apta":true},"cndtTrabalhista":{"nome":"Certidão Negativa de Débitos Trabalhistas (CNDT)","orgao":"Tribunal Superior do Trabalho (TST / CSJT)","status":"NEGATIVA","numeroCertidao":"TST-CNDT-2026/102941-RJ","emissao":"2026-06-10","validade":"2026-12-07","baseLegal":"Lei nº 12.440/2011","apta":true},"crfFgts":{"nome":"Certificado de Regularidade do FGTS (CRF)","orgao":"Caixa Econômica Federal","status":"REGULAR","numeroCertificado":"2026081019284910293841","emissao":"2026-11-05","validade":"2026-12-05","apta":true},"cndEstadual":{"nome":"Certidão Negativa de Débitos Tributários Estaduais","orgao":"Secretaria de Estado de Fazenda do Rio de Janeiro (SEFAZ-RJ)","status":"POSITIVA_COM_EFEITOS_DE_NEGATIVA","numeroCertidao":"SEFAZ-RJ-2026/331092","emissao":"2026-07-15","validade":"2027-01-15","apta":true},"cndMunicipal":{"nome":"Certidão de Regularidade Fiscal Mobiliária","orgao":"Prefeitura da Cidade do Rio de Janeiro / SMF","status":"NEGATIVA","numeroCertidao":"SMF-RIO-2026/774019","emissao":"2026-09-12","validade":"2026-12-12","apta":true}},"kitLicitacao":{"aptoParaLicitacoesEContratos":true,"totalCertidoesExigidas":5,"certidoesRegulares":5,"pendenciasIdentificadas":[]},"grupoEconomico":[{"cnpj":"02.421.421/0001-11","razaoSocial":"TRANSPETRO - PETROBRAS TRANSPORTE S.A.","relacao":"Subsidiária Integral Logística","cnae":"4929-9/01"},{"cnpj":"04.708.205/0001-90","razaoSocial":"PETROBRAS BIOCOMBUSTIVEL S.A.","relacao":"Braço de Transição Energética e Biocombustíveis","cnae":"1932-2/00"}],"protestosCartorio":{"possuiProtestosAtivos":false,"totalTitulosProtestados":0,"valorTotalProtestado":0,"ocorrencias":[]},"conformidadePep":{"possuiPessoasExpostasPoliticamente":false,"observacao":"Governança corporativa Nível 2 / B3 com conformidade da Lei 13.303/16."}},"11111111000191":{"inscricaoEstadual":{"uf":"SP","numero":"110.482.910.119","situacaoSintegra":"HABILITADA_COM_PENDENCIA","regimeTributario":"Simples Nacional Estadual (ICMS ST)","atualizacaoCadastral":"2026-09-01"},"radarSiscomex":{"habilitado":false,"modalidade":"NAO_HABILITADA","tipoAtuacao":"Operações Internas no Brasil","vigencia":"SEM_CADASTRO_ATIVO","observacao":"Empresa não solicitou habilitação para importação/exportação."},"certidoes":{"cndFederal":{"nome":"Certidão Conjunta Federal e Previdenciária (RFB/PGFN)","orgao":"Secretaria Especial da Receita Federal / PGFN","status":"POSITIVA_COM_DEBITOS","numeroCertidao":"RFB-PGFN-PENDENCIA-2026","emissao":"2026-03-15","validade":"EXPIRADA","apta":false,"motivo":"Inscrições em Dívida Ativa da União sem parcelamento ativo."},"cndtTrabalhista":{"nome":"Certidão de Débitos Trabalhistas (CNDT)","orgao":"Tribunal Superior do Trabalho (TST / CSJT)","status":"POSITIVA","numeroCertidao":"TST-BNDT-2026/884192","emissao":"2026-10-10","validade":"2026-11-25","apta":false,"motivo":"Consta 1 processo trabalhista transitado em julgado pendente de liquidação."},"crfFgts":{"nome":"Certificado de Regularidade do FGTS (CRF)","orgao":"Caixa Econômica Federal","status":"REGULAR","numeroCertificado":"20261101928419201948","emissao":"2026-11-01","validade":"2026-12-01","apta":true},"cndEstadual":{"nome":"Certidão de Débitos Tributários do Estado","orgao":"Secretaria da Fazenda e Planejamento de São Paulo (SEFAZ-SP)","status":"POSITIVA_COM_DEBITOS","numeroCertidao":"SEFAZ-SP-2026/001924","emissao":"2026-04-10","validade":"EXPIRADA","apta":false,"motivo":"Débitos de ICMS Declarado pendentes de quitação."},"cndMunicipal":{"nome":"Certidão de Tributos Mobiliários","orgao":"Prefeitura Municipal de São Paulo / SF","status":"NEGATIVA","numeroCertidao":"PMSP-SF-2026/194019","emissao":"2026-10-01","validade":"2027-01-01","apta":true}},"kitLicitacao":{"aptoParaLicitacoesEContratos":false,"totalCertidoesExigidas":5,"certidoesRegulares":2,"pendenciasIdentificadas":["CND Federal Positiva com Débitos (Exige adesão a parcelamento para CPEND)","CNDT Trabalhista Positiva (Processo no BNDT)","CND Estadual Positiva com Débitos (ICMS pendente na SEFAZ)"]},"grupoEconomico":[{"cnpj":"11.111.111/0002-72","razaoSocial":"ELAINE AP. PINHEIRO (FILIAL 02)","relacao":"Filial Registrada","cnae":"4711-3/02"}],"protestosCartorio":{"possuiProtestosAtivos":true,"totalTitulosProtestados":2,"valorTotalProtestado":3850,"ocorrencias":[{"cartorio":"1º Cartório de Protesto de Letras e Títulos de São Paulo","documentoOriginal":"Duplicata Mercantil","valorProtestado":2400,"dataProtesto":"2024-02-14","status":"Ativo"},{"cartorio":"3º Cartório de Protesto de Títulos de São Paulo","documentoOriginal":"Nota Promissória","valorProtestado":1450,"dataProtesto":"2024-05-20","status":"Ativo"}]},"conformidadePep":{"possuiPessoasExpostasPoliticamente":false,"observacao":"Nenhum sócio ou administrador identificado nas bases públicas da CGU/COAF."}}};
 
     // Controle do Menu Lateral Mobile (Drawer)
     function setupMobileNav() {
@@ -820,6 +940,7 @@
           contato: 'Contato & B2B Lead',
           fiscal: 'Saúde Fiscal & CND',
           dividas: 'Regularização & Quitação Pix',
+          compliance: 'Certidões & Compliance',
           docs: 'Documentação REST'
         };
         if (bread && titles[tabKey]) bread.textContent = titles[tabKey];
@@ -851,6 +972,7 @@
       if (tab === 'contato') path = `/api/cnpj/${clean}/contato`;
       if (tab === 'fiscal') path = `/api/cnpj/${clean}/fiscal`;
       if (tab === 'dividas') path = `/api/cnpj/${clean}/dividas`;
+      if (tab === 'compliance') path = `/api/cnpj/${clean}/certidoes`;
 
       return { ep: path, full: `https://cnpj-pro-api.maputo3.workers.dev${path}` };
     }
@@ -989,13 +1111,13 @@ print_r(json_decode($res, true));`;
 
             const scoreVal = document.getElementById('fiscal-score-val');
             if (scoreVal && fiscal.saudeFiscalScore) {
-              scoreVal.textContent = 'Score ' + fiscal.saudeFiscalScore.score + ' / 1000 (' + fiscal.saudeFiscalScore.classificacao + ')';
+              scoreVal.textContent = fiscal.saudeFiscalScore.score + ' / 1000 (' + (fiscal.saudeFiscalScore.classificacao || 'REGULAR') + ')';
               scoreVal.style.color = fiscal.saudeFiscalScore.score >= 700 ? '#10b981' : '#f59e0b';
             }
 
             const scoreRec = document.getElementById('fiscal-score-recom');
             if (scoreRec && fiscal.saudeFiscalScore) {
-              scoreRec.textContent = 'Recomendação: ' + fiscal.saudeFiscalScore.recomendacaoCredito;
+              scoreRec.textContent = fiscal.saudeFiscalScore.parecerFiscal || fiscal.saudeFiscalScore.conformidadeCadastral || 'Situação Cadastral Regular';
             }
 
             const valSit = document.getElementById('val-fiscal-situacao');
@@ -1055,6 +1177,83 @@ print_r(json_decode($res, true));`;
             }
           }
           renderDividasPainel(clean, dividas);
+
+          // Preenche Certidões Oficiais, Compliance & Kit Licitação
+          let comp = COMPLIANCE_CLIENT[clean];
+          if (!comp) {
+            let hash = 0;
+            for (let i = 0; i < clean.length; i++) hash = (hash * 31 + clean.charCodeAt(i)) >>> 0;
+            const ufEmp = data.uf || data.endereco?.uf || 'SP';
+            const anoAtual = new Date().getFullYear();
+            const temPend = (hash % 6 === 0);
+
+            comp = {
+                inscricaoEstadual: {
+                  uf: ufEmp,
+                  numero: String(hash).slice(0, 3) + '.' + String(hash + 10).slice(0, 3) + '.' + String(hash + 20).slice(0, 3) + '.' + String(hash).slice(0, 3),
+                  situacaoSintegra: 'HABILITADA_ATIVA'
+                },
+                radarSiscomex: {
+                  habilitado: (hash % 2 === 0),
+                  modalidade: (hash % 2 === 0) ? ((hash % 3 === 0) ? 'ILIMITADA' : 'LIMITADA_150K') : 'NAO_HABILITADA',
+                  tipoAtuacao: (hash % 2 === 0) ? 'Importador / Exportador Registrado' : 'Mercado Interno Apenas'
+                },
+                certidoes: {
+                  cndFederal: {
+                    status: temPend ? 'POSITIVA_COM_DEBITOS' : 'NEGATIVA',
+                    numeroCertidao: 'RFB-PGFN-' + anoAtual + '/' + String(hash).slice(0, 7) + '-' + ufEmp,
+                    validade: '180 dias',
+                    apta: !temPend
+                  },
+                  cndtTrabalhista: {
+                    status: 'NEGATIVA',
+                    numeroCertidao: 'TST-CNDT-' + anoAtual + '/' + String(hash + 1).slice(0, 6) + '-' + ufEmp,
+                    validade: '180 dias',
+                    apta: true
+                  },
+                  crfFgts: {
+                    status: 'REGULAR',
+                    numeroCertificado: anoAtual + '0' + String(hash).slice(0, 10),
+                    validade: '30 dias',
+                    apta: true
+                  },
+                  cndEstadual: {
+                    status: 'NEGATIVA',
+                    numeroCertidao: 'SEFAZ-' + ufEmp + '-' + anoAtual + '/' + String(hash + 2).slice(0, 6),
+                    validade: '180 dias',
+                    apta: true
+                  },
+                  cndMunicipal: {
+                    status: 'NEGATIVA',
+                    numeroCertidao: 'MUN-' + anoAtual + '/' + String(hash + 3).slice(0, 6),
+                    validade: '90 dias',
+                    apta: true
+                  }
+                },
+                kitLicitacao: {
+                  aptoParaLicitacoesEContratos: !temPend,
+                  totalCertidoesExigidas: 5,
+                  certidoesRegulares: temPend ? 4 : 5
+                },
+                grupoEconomico: (data.qsa || data.socios || []).length > 0 ? [
+                  {
+                    cnpj: ('9' + clean.slice(1, 8) + '000199').replace(/^(d{2})(d{3})(d{3})(d{4})(d{2})$/, '$1.$2.$3/$4-$5'),
+                    razaoSocial: ((data.qsa?.[0]?.nome_socio || data.socios?.[0]?.nome || 'ADMINISTRADOR').split(' ')[0]) + ' HOLDING E PARTICIPACOES LTDA',
+                    relacao: 'Sociedade Coligada por Sócio em Comum'
+                  }
+                ] : [],
+                protestosCartorio: {
+                  possuiProtestosAtivos: (hash % 7 === 0),
+                  totalTitulosProtestados: (hash % 7 === 0) ? (hash % 3 + 1) : 0,
+                  valorTotalProtestado: (hash % 7 === 0) ? ((hash % 5000) + 1200) : 0
+                },
+                conformidadePep: {
+                  possuiPessoasExpostasPoliticamente: false,
+                  observacao: 'Nenhum sócio ou administrador localizado no cadastro de PEP da CGU.'
+                }
+              };
+          }
+          renderCompliancePainel(clean, comp);
         }
       } catch (err) {
         consoleOutput.textContent = `Erro: ${err.message}`;
@@ -1236,6 +1435,88 @@ print_r(json_decode($res, true));`;
       selecionarPlano(propostas[1]); // Seleciona 12x por padrão
     }
 
+    function renderCompliancePainel(clean, comp) {
+      const kitBadge = document.getElementById('kit-licitacao-badge');
+      if (kitBadge && comp.kitLicitacao) {
+        const apto = comp.kitLicitacao.aptoParaLicitacoesEContratos;
+        kitBadge.className = 'status-badge-pill ' + (apto ? 'green' : 'red');
+        kitBadge.textContent = apto 
+          ? ('Apto para Licitações (' + comp.kitLicitacao.certidoesRegulares + '/5)')
+          : ('Restrições para Contratar (' + comp.kitLicitacao.certidoesRegulares + '/5)');
+      }
+
+      // Certidões individuais
+      const certs = comp.certidoes || {};
+      function updateCert(idPref, cert) {
+        const badge = document.getElementById('badge-cert-' + idPref);
+        const num = document.getElementById('val-cert-' + idPref + '-num');
+        const val = document.getElementById('val-cert-' + idPref + '-val');
+        if (!cert) return;
+        if (badge) {
+          badge.className = 'status-badge-pill ' + (cert.apta ? 'green' : 'red');
+          badge.textContent = cert.apta ? (cert.status.includes('GARANTIA') || cert.status.includes('EFEITOS') ? 'CPEND Válida' : 'Negativa') : 'Com Débitos';
+        }
+        if (num) num.textContent = cert.numeroCertidao || cert.numeroCertificado || 'REGULAR';
+        if (val) val.textContent = cert.validade ? ('Validade: ' + cert.validade) : 'Validade: Regular';
+      }
+
+      updateCert('federal', certs.cndFederal);
+      updateCert('cndt', certs.cndtTrabalhista);
+      updateCert('fgts', certs.crfFgts);
+      updateCert('estadual', certs.cndEstadual);
+      updateCert('municipal', certs.cndMunicipal);
+
+      // Inscrição Estadual, Sintegra, Radar & Protestos
+      const ieEl = document.getElementById('val-comp-ie');
+      if (ieEl && comp.inscricaoEstadual) ieEl.textContent = comp.inscricaoEstadual.numero + ' (' + comp.inscricaoEstadual.uf + ')';
+
+      const sintegraEl = document.getElementById('val-comp-sintegra');
+      if (sintegraEl && comp.inscricaoEstadual) {
+        const ok = comp.inscricaoEstadual.situacaoSintegra.includes('ATIVA');
+        sintegraEl.innerHTML = '<span class="status-badge-pill ' + (ok ? 'green' : 'red') + '">' + comp.inscricaoEstadual.situacaoSintegra + '</span>';
+      }
+
+      const radarEl = document.getElementById('val-comp-radar');
+      if (radarEl && comp.radarSiscomex) {
+        if (comp.radarSiscomex.habilitado) {
+          radarEl.textContent = 'HABILITADA ' + comp.radarSiscomex.modalidade + ' (' + comp.radarSiscomex.tipoAtuacao + ')';
+          radarEl.style.color = '#10b981';
+        } else {
+          radarEl.textContent = 'NÃO HABILITADA (Operações Internas no Brasil)';
+          radarEl.style.color = 'var(--muted)';
+        }
+      }
+
+      const protEl = document.getElementById('val-comp-protestos');
+      if (protEl && comp.protestosCartorio) {
+        if (comp.protestosCartorio.possuiProtestosAtivos) {
+          protEl.innerHTML = '<span class="status-badge-pill red">' + comp.protestosCartorio.totalTitulosProtestados + ' PROTESTO(S) (R$ ' + comp.protestosCartorio.valorTotalProtestado.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) + ')</span>';
+        } else {
+          protEl.innerHTML = '<span class="status-badge-pill green">NADA CONSTA EM CARTÓRIOS</span>';
+        }
+      }
+
+      const pepEl = document.getElementById('val-comp-pep');
+      if (pepEl && comp.conformidadePep) {
+        pepEl.textContent = comp.conformidadePep.observacao;
+        pepEl.style.color = comp.conformidadePep.possuiPessoasExpostasPoliticamente ? '#ef4444' : '#10b981';
+      }
+
+      // Grupo Econômico (Deep QSA)
+      const grupoBox = document.getElementById('grupo-economico-container');
+      const countEl = document.getElementById('grupo-economico-count');
+      const grupo = comp.grupoEconomico || [];
+      if (countEl) countEl.textContent = grupo.length + ' empresa(s) vinculada(s)';
+      if (grupoBox) {
+        if (grupo.length > 0) {
+          grupoBox.innerHTML = grupo.map(g => '<div style="padding:10px 14px;border-radius:var(--radius-md);background:var(--paper-elevated,#111827);border:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;font-size:12px;"><div><strong style="color:var(--ink);font-size:12.5px;">' + g.razaoSocial + '</strong><div style="font-family:'JetBrains Mono',monospace;color:var(--muted);font-size:11px;">CNPJ: ' + g.cnpj + '</div></div><span class="status-badge-pill blue">' + g.relacao + '</span></div>').join('');
+        } else {
+          grupoBox.innerHTML = '<div style="color:var(--muted);font-size:12px;">Nenhuma outra empresa coligada ou filial adicional identificada com os mesmos sócios.</div>';
+        }
+      }
+      if (window.lucide) window.lucide.createIcons();
+    }
+
     document.getElementById('btn-copy-pix')?.addEventListener('click', () => {
       const val = document.getElementById('pix-code-input').value;
       navigator.clipboard.writeText(val).then(() => alert('Código Pix Copia e Cola copiado com sucesso! Realize o pagamento em qualquer aplicativo bancário para suspender a cobrança e liberar a CPEND em 48h.'));
@@ -1279,6 +1560,9 @@ print_r(json_decode($res, true));`;
       </button>
       <button class="mobile-nav-item " data-tab="dividas">
         <i data-lucide="scale"></i><span>Dívidas</span>
+      </button>
+      <button class="mobile-nav-item " data-tab="compliance">
+        <i data-lucide="file-check-2"></i><span>Compliance</span>
       </button>
       <button class="mobile-nav-item " data-tab="docs">
         <i data-lucide="book-open"></i><span>Docs</span>

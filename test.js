@@ -5,6 +5,7 @@
 import worker, { validarDigitoCnpj } from './worker.js';
 import { auditarSaudeFiscalCnpj, SUBLIMITES_SIMPLES_ESTADUAIS } from './saude-fiscal-pgfn.js';
 import { consultarDividasEmpresa, simularNegociacaoDividas, obterAcompanhamentoQuitacao } from './regularizacao-dividas-pro.js';
+import { auditarCertidoesOficiais, auditarComplianceEGrupo } from './certidoes-compliance-pro.js';
 
 let passed = 0;
 let failed = 0;
@@ -200,6 +201,36 @@ const acompResp = await worker.fetch(new Request('https://api.test/api/cnpj/1111
 const acompBody = await acompResp.json();
 assert(acompResp.status === 200, 'Sub-rota /api/cnpj/:cnpj/acompanhamento responde 200 OK');
 assert(acompBody.cronogramaParcelas !== undefined, 'Sub-rota /acompanhamento retorna timeline das parcelas');
+
+// 7. Combo de Certidões Oficiais & Compliance Regulatória
+console.log('\n--- 7. Certidões Oficiais (Kit Licitação) & Compliance ---');
+const certsBB = auditarCertidoesOficiais('00.000.000/0001-91');
+assert(certsBB.kitLicitacao.aptoParaLicitacoesEContratos === true, 'Banco do Brasil com 5/5 certidões regulares para licitar');
+assert(certsBB.certidoes.cndtTrabalhista.status === 'NEGATIVA', 'CNDT Trabalhista do TST regular');
+assert(certsBB.certidoes.crfFgts.status === 'REGULAR', 'Certificado CRF do FGTS regular');
+assert(certsBB.certidoes.cndEstadual.status === 'NEGATIVA', 'CND Estadual da SEFAZ regular');
+
+const compBB = auditarComplianceEGrupo('00.000.000/0001-91');
+assert(compBB.radarSiscomex.habilitado === true, 'Radar Siscomex habilitado como ILIMITADA');
+assert(compBB.protestosCartorio.possuiProtestosAtivos === false, 'Sem protestos em cartório');
+assert(compBB.grupoEconomico.length >= 2, 'Identifica empresas do grupo econômico e subsidiárias');
+
+// Sub-rotas de Compliance no Worker
+const certsResp = await worker.fetch(new Request('https://api.test/api/cnpj/00000000000191/certidoes'), {
+  CNPJ_KV: { get: async () => ({ cnpj: '00000000000191', razaoSocial: 'BANCO DO BRASIL SA', endereco: { uf: 'DF' } }) }
+});
+const certsBody = await certsResp.json();
+assert(certsResp.status === 200, 'Sub-rota /api/cnpj/:cnpj/certidoes responde 200 OK');
+assert(certsBody.certidoes.cndtTrabalhista !== undefined, 'Sub-rota /certidoes entrega CNDT Trabalhista');
+assert(certsBody.certidoes.crfFgts !== undefined, 'Sub-rota /certidoes entrega CRF FGTS');
+
+const compResp = await worker.fetch(new Request('https://api.test/api/cnpj/00000000000191/compliance'), {
+  CNPJ_KV: { get: async () => ({ cnpj: '00000000000191', razaoSocial: 'BANCO DO BRASIL SA', endereco: { uf: 'DF' } }) }
+});
+const compBody = await compResp.json();
+assert(compResp.status === 200, 'Sub-rota /api/cnpj/:cnpj/compliance responde 200 OK');
+assert(compBody.radarSiscomex.habilitado === true, 'Sub-rota /compliance entrega Radar Siscomex');
+assert(compBody.inscricaoEstadual.situacaoSintegra !== undefined, 'Sub-rota /compliance entrega Sintegra');
 
 console.log(`\n📊 Resultado dos Testes: ${passed} passaram, ${failed} falharam.\n`);
 

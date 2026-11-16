@@ -53,9 +53,9 @@ export const MOCKS_FISCAIS_CONHECIDOS = {
     },
     saudeFiscalScore: {
       score: 980,
-      classificacao: 'TRIPLE_A_EXCELENTE',
-      probabilidadeInadimplencia: '0.1%',
-      recomendacaoCredito: 'CRÉDITO AMPLAMENTE RECOMENDADO'
+      classificacao: 'REGULARIDADE_MAXIMA',
+      parecerFiscal: 'EMPRESA 100% REGULAR PERANTE A FAZENDA NACIONAL',
+      conformidadeCadastral: 'Sem pendências fiscais, previdenciárias ou trabalhistas ativas.'
     }
   },
 
@@ -87,9 +87,9 @@ export const MOCKS_FISCAIS_CONHECIDOS = {
     },
     saudeFiscalScore: {
       score: 990,
-      classificacao: 'TRIPLE_A_EXCELENTE',
-      probabilidadeInadimplencia: '0.05%',
-      recomendacaoCredito: 'RISCO ZERO / INSTITUIÇÃO FINANCEIRA'
+      classificacao: 'REGULARIDADE_MAXIMA',
+      parecerFiscal: 'INSTITUIÇÃO FINANCEIRA COM CERTIDÃO NEGATIVA TOTAL',
+      conformidadeCadastral: 'Sem débitos tributários federais ou previdenciários.'
     }
   },
 
@@ -123,9 +123,9 @@ export const MOCKS_FISCAIS_CONHECIDOS = {
     },
     saudeFiscalScore: {
       score: 920,
-      classificacao: 'A_ALTA_SOLVENCIA',
-      probabilidadeInadimplencia: '0.8%',
-      recomendacaoCredito: 'CRÉDITO RECOMENDADO COM CONDIÇÕES PADRÃO'
+      classificacao: 'ALTA_REGULARIDADE',
+      parecerFiscal: 'EMPRESA REGULAR NO SIMPLES NACIONAL',
+      conformidadeCadastral: 'Situação fiscal e cadastral regular sem restrições.'
     }
   }
 };
@@ -192,9 +192,9 @@ export function auditarSaudeFiscalCnpj(rawCnpj, dadosEmpresa = {}) {
     },
     saudeFiscalScore: {
       score: scoreCalculado,
-      classificacao: scoreCalculado >= 850 ? 'A_EXCELENTE' : (scoreCalculado >= 650 ? 'B_BOM' : 'C_ALTO_RISCO'),
-      probabilidadeInadimplencia: scoreCalculado >= 850 ? '0.5%' : (scoreCalculado >= 650 ? '4.2%' : '42.8%'),
-      recomendacaoCredito: scoreCalculado >= 650 ? 'CRÉDITO APROVADO' : 'EXIGIR GARANTIA REAL / AVAL'
+      classificacao: scoreCalculado >= 850 ? 'REGULARIDADE_MAXIMA' : (scoreCalculado >= 650 ? 'REGULARIDADE_BOA' : 'ATENCAO_FISCAL'),
+      parecerFiscal: scoreCalculado >= 850 ? 'SITUAÇÃO FISCAL REGULAR' : (scoreCalculado >= 650 ? 'REGULAR COM OBSERVAÇÕES' : 'PENDÊNCIAS EM COBRANÇA'),
+      conformidadeCadastral: scoreCalculado >= 650 ? 'Habilitada perante a administração pública' : 'Pendências impeditivas identificadas'
     }
   };
 }
