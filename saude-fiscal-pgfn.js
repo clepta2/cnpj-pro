@@ -167,10 +167,12 @@ export function auditarSaudeFiscalCnpj(rawCnpj, dadosEmpresa = {}) {
     cnpj: clean.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, '$1.$2.$3/$4-$5'),
     razaoSocial: dadosEmpresa.razaoSocial || 'EMPRESA NACIONAL AUDITADA',
     situacaoFiscal: ativa ? (temPendencia ? 'REGULAR_COM_OBSERVACOES' : 'REGULAR_PLENA') : 'IRREGULAR_BAIXADA',
+    estimativaModelada: true,
+    aviso: 'Esta análise de saúde fiscal é uma modelagem cadastral de inteligência tributária e não substitui a certidão oficial emitida nos portais e-CAC e Regularize PGFN.',
     certidaoNegativaDebitos: {
       tipo: cndStatus,
       status: ativa ? (temPendencia ? 'REGULAR_COM_GARANTIA' : 'NEGATIVA_TOTAL') : 'IRREGULAR',
-      numeroCertidao: `RFB-PGFN-2026/${clean.slice(0, 7)}-${uf}`,
+      numeroCertidao: `RFB-PGFN-ESTIMADA/${clean.slice(0, 7)}-${uf}`,
       validadeDias: 180,
       aptaParaLicitacoes: ativa && !temPendencia,
       observacao: ativa
