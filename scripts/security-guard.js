@@ -64,6 +64,30 @@ const SECRET_PATTERNS = [
   }
 ];
 
+// Padrões de alucinação e dados falsos estritamente proibidos em código de produção
+const HALLUCINATION_PATTERNS = [
+  {
+    nome: 'Fallback Fixo de Jogos de Futebol (fb_001/Flamengo)',
+    regex: /\bfb_00[1-3]\b/g
+  },
+  {
+    nome: 'Preço Cripto Fixo Hardcoded',
+    regex: /precoUsd:\s*91500/g
+  },
+  {
+    nome: 'Certidão CND da PGFN/Receita com Ano Fixo sem Estimativa',
+    regex: /numeroCertidao:\s*[`'"]RFB-PGFN-202[0-9]\//g
+  },
+  {
+    nome: 'Fallback Silencioso de Código FIPE para VW Nivus',
+    regex: /VEICULOS_FIPE_CATALOGO\[clean\]\s*\|\|\s*VEICULOS_FIPE_CATALOGO\['005340-6'\]/g
+  },
+  {
+    nome: 'Simulação Falsa de Certificado BACEN/COAF',
+    regex: /certificadoHash:\s*[`'"]pld_/g
+  }
+];
+
 // Valores permitidos de mock / documentação / placeholders
 function isPlaceholder(val) {
   const v = val.toLowerCase();
@@ -126,7 +150,7 @@ export function executarAuditoriaSeguranca(repoDir = process.cwd(), isPrePush = 
   if (isPrePush) {
     try {
       let unpushedDiff = '';
-      const gitExclude = '-- . ":(exclude)scripts/security-guard.js" ":(exclude)*.instructions.md"';
+      const gitExclude = '-- . ":(exclude)scripts/security-guard.js" ":(exclude)scripts/audit-anti-hallucination.js" ":(exclude)*.instructions.md"';
       try {
         unpushedDiff = execSync(`git log @{u}..HEAD -p ${gitExclude}`, { cwd: repoDir, encoding: 'utf8' });
       } catch (_) {
@@ -155,6 +179,7 @@ export function executarAuditoriaSeguranca(repoDir = process.cwd(), isPrePush = 
     if (
       baseName === 'security-guard.js' ||
       baseName === 'audit-secrets.js' ||
+      baseName === 'audit-anti-hallucination.js' ||
       baseName === 'install-hard-security-rules.js' ||
       baseName === 'install-extended-security.js' ||
       relPath.endsWith('.instructions.md')
@@ -212,6 +237,18 @@ export function executarAuditoriaSeguranca(repoDir = process.cwd(), isPrePush = 
               const mascarado = m.length > 12 ? `${m.slice(0, 8)}...${m.slice(-4)}` : '******';
               erros.push(`[SEGREDO DETECTADO] ${pattern.nome} em "${relPath}" -> ${mascarado}`);
             }
+          }
+        }
+      }
+
+      // C.2 Verifica padrões de alucinação e dados falsos em código de produção
+      const isTestFile = relPath.includes('test') || relPath.includes('spec');
+      if (!isTestFile) {
+        for (const pattern of HALLUCINATION_PATTERNS) {
+          const matches = content.match(pattern.regex);
+          if (matches) {
+            violacoes++;
+            erros.push(`[ALUCINAÇÃO DETECTADA] ${pattern.nome} em "${relPath}"`);
           }
         }
       }
