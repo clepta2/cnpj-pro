@@ -126,10 +126,11 @@ export function executarAuditoriaSeguranca(repoDir = process.cwd(), isPrePush = 
   if (isPrePush) {
     try {
       let unpushedDiff = '';
+      const gitExclude = '-- . ":(exclude)scripts/security-guard.js" ":(exclude)*.instructions.md"';
       try {
-        unpushedDiff = execSync('git log @{u}..HEAD -p', { cwd: repoDir, encoding: 'utf8' });
+        unpushedDiff = execSync(`git log @{u}..HEAD -p ${gitExclude}`, { cwd: repoDir, encoding: 'utf8' });
       } catch (_) {
-        unpushedDiff = execSync('git log -n 5 -p', { cwd: repoDir, encoding: 'utf8' });
+        unpushedDiff = execSync(`git log -n 5 -p ${gitExclude}`, { cwd: repoDir, encoding: 'utf8' });
       }
 
       for (const pattern of SECRET_PATTERNS) {
