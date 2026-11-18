@@ -67,7 +67,7 @@ export const MOCKS_FISCAIS_CONHECIDOS = {
     certidaoNegativaDebitos: {
       tipo: 'CND (Certidão Negativa de Débitos Relativos a Créditos Tributários Federais e à Dívida Ativa da União)',
       status: 'NEGATIVA_TOTAL',
-      numeroCertidao: 'RFB-PGFN-2026/0019283-DF',
+      numeroCertidao: 'RFB-PGFN-REFERENCIA/0019283-DF',
       validadeDias: 180,
       vencimento: '2026-12-15',
       aptaParaLicitacoes: true,
@@ -101,7 +101,7 @@ export const MOCKS_FISCAIS_CONHECIDOS = {
     certidaoNegativaDebitos: {
       tipo: 'CND (Certidão Negativa Plena)',
       status: 'NEGATIVA_TOTAL',
-      numeroCertidao: 'RFB-PGFN-2026/4891677-SP',
+      numeroCertidao: 'RFB-PGFN-REFERENCIA/4891677-SP',
       validadeDias: 180,
       vencimento: '2026-12-31',
       aptaParaLicitacoes: true,

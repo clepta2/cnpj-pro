@@ -43,7 +43,7 @@ export const COMPLIANCE_DATABASE = {
         nome: 'Certidão Conjunta Federal e Previdenciária (RFB/PGFN)',
         orgao: 'Secretaria Especial da Receita Federal / PGFN',
         status: 'NEGATIVA',
-        numeroCertidao: 'RFB-PGFN-2026/0019283-DF',
+        numeroCertidao: 'RFB-PGFN-REFERENCIA/0019283-DF',
         emissao: '2026-06-18',
         validade: '2026-12-15',
         apta: true
